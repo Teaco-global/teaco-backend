@@ -5,7 +5,7 @@ import { ProxyRouter } from "./api/routes";
 import cors from "cors"
 
 let corsOptions = {
-    origin : ['http://localhost:5173'],
+    origin : ['http://localhost:5173', 'https://teaco.onrender.com/'],
  }
 class Server {
     private app: express.Application
