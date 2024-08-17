@@ -6,6 +6,8 @@ import cors from "cors"
 
 let corsOptions = {
     origin : ['http://localhost:5173', 'https://teaco.onrender.com/'],
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization'
  }
 class Server {
     private app: express.Application
