@@ -9,13 +9,16 @@ import { Authenticate, Validator } from "../../middlewares";
 import { login, resendVerificationCode, signUp, verifyAccount } from "../../validators";
 import { transporter } from "../../helpers";
 import { UsersStatusEnum } from "../../enums";
+import { WorkspaceService } from "../../services/workspaceService";
 
 export class AuthController {
   public constructor() {}
 
   static async signUp(req: Request, res: Response): Promise<Response> {
-    const { name, email, password } = req.body as InputUserInterface;
+    
+    const { name, email, password, workspaceName } = req.body as InputUserInterface;
     Validator.check(signUp, { name, email, password });
+
     const userExists = await new UsersService().findOne({email: email})
     if (userExists) {
       return res.status(409).json({
@@ -25,27 +28,10 @@ export class AuthController {
         }
       });
     }
-    const verificationCode = crypto.randomInt(10000, 99999);
-
-    await new UsersService().create({
-      name: name,
-      email: email,
-      password: await bcrypt.hash(password, saltRound),
-      verificationCode: verificationCode,
-    });
-
-    try {
-      await transporter.sendMail({
-        to: email,
-        subject: "Verification code",
-        html: `Your verification code is <b>${verificationCode}<b>`,
-      });
-    } catch (err: any) {
-      console.error(err.message);
-    }
+    await new UsersService().createUserAndWorkspace({name, email, password, workspaceName})
 
     return res.status(200).json({
-      message: "User has been registered successfully.",
+      message: "User and workspace created successfully.",
     });
   }
 

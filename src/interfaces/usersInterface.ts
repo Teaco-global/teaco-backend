@@ -5,6 +5,7 @@ export interface InputUserInterface {
   name: string;
   email: string;
   password: string;
+  workspaceName?: string;
   //   status: UsersStatusEnum;
   //   verificationCode: number;
 }
