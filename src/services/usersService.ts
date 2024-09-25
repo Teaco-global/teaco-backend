@@ -53,10 +53,10 @@ export class UsersService {
     password,
     verificationCode,
   }: {
-    name: string;
-    email: string;
-    password: string;
-    verificationCode: number;
+    name?: string;
+    email?: string;
+    password?: string;
+    verificationCode?: number;
   }): Promise<UserInterface> {
     const emailExists = await this.repository.findOne({
       where: {
@@ -92,6 +92,8 @@ export class UsersService {
     id: number;
     input: Partial<UserInterface>;
   }): Promise<UserInterface> {
-    return this.repository.update(input, { where: {id: id}});
+    let where: WhereOptions<any> = {};
+
+    return this.repository.updateOne({id, input});
   }
 }

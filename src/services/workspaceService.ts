@@ -1,3 +1,4 @@
+import { WhereOptions } from "sequelize";
 import { RoleEnum, UserWorkspaceStatusEnum } from "../enums";
 import { Ksuid } from "../helpers";
 import { InputWorkspaceInterface, WorkspaceInterface } from "../interfaces";
@@ -26,7 +27,7 @@ export class WorkspaceService {
     input: InputWorkspaceInterface
   ): Promise<WorkspaceInterface> {
     const rolesExists = await this.roleRepository.findOne({
-      where: { slug: RoleEnum.owner },
+      where: { slug: RoleEnum.OWNER.toLocaleLowerCase() },
     });
 
     if (!rolesExists) {
@@ -41,7 +42,7 @@ export class WorkspaceService {
       userId: input.ownerId,
       workspaceId: workspace.id,
       identity: Ksuid.generate(),
-      status: UserWorkspaceStatusEnum.accepted,
+      status: UserWorkspaceStatusEnum.ACCEPTED,
     });
 
     await this.userWorkspaceRoleRepository.create({
@@ -50,5 +51,13 @@ export class WorkspaceService {
     });
 
     return workspace;
+  }
+
+  public async findOne({secret}:{secret?: string}): Promise<WorkspaceInterface> {
+    let where: WhereOptions<any> = {};
+
+    if(secret) where = { ...where, secret: secret }
+
+    return this.repository.findOne({ where: where })
   }
 }

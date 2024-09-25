@@ -1,4 +1,4 @@
 export enum UsersStatusEnum {
-    VERFIED = "VERIFIED",
-    UNVERIFIED = "UN-VERIFIED"
+  VERFIED = "VERIFIED",
+  UNVERIFIED = "UN-VERIFIED",
 }

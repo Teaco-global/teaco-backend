@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import { SignOptions } from "jsonwebtoken";
 
 import { accessTokenExpiresIn, jwtClientSecret } from "../config";
+import { WorkspaceService } from "../services/workspaceService";
+import { UserWorkspaceService } from "../services";
 
 class Authenticate {
   private static instance: Authenticate;
@@ -32,8 +34,24 @@ class Authenticate {
       return { success: true, data: decoded };
     } catch (error) {
       console.error(`${error.name}`)
+      throw new Error(error)
     }
   }
+
+  public async verifyWorkspace(secret, userId) {
+    try {
+      const workspace = await new WorkspaceService().findOne({secret: secret})
+
+      if(!workspace) throw new Error('Workspace does not exists.');
+
+      const userWorkspace = await new UserWorkspaceService().findOne({userId: userId, workspaceId: workspace.id})
+      
+      return userWorkspace
+    } catch (error) {
+      throw new Error(`Invalid workspace secret`)
+    }
+  }
+
 }
 
 const authenticate = Authenticate.get();

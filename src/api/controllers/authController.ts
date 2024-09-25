@@ -4,12 +4,10 @@ import { Request, Response } from "express";
 
 import { InputUserInterface, UserInterface } from "../../interfaces";
 import { UsersService } from "../../services";
-import { saltRound } from "../../config";
 import { Authenticate, Validator } from "../../middlewares";
 import { login, resendVerificationCode, signUp, verifyAccount } from "../../validators";
 import { transporter } from "../../helpers";
 import { UsersStatusEnum } from "../../enums";
-import { WorkspaceService } from "../../services/workspaceService";
 
 export class AuthController {
   public constructor() {}

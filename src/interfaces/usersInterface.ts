@@ -1,5 +1,6 @@
 import * as Sequelize from "sequelize";
 import { UsersStatusEnum } from "../enums";
+import { ModelTimestampExtend } from "./timestampInterface";
 
 export interface InputUserInterface {
   name: string;
@@ -10,7 +11,7 @@ export interface InputUserInterface {
   //   verificationCode: number;
 }
 
-export interface UserInterface extends InputUserInterface {
+export interface UserInterface extends InputUserInterface, ModelTimestampExtend {
   id: number;
   status: UsersStatusEnum;
   verificationCode: number;

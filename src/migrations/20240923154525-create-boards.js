@@ -1,6 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 'use strict';
 
 const { DataTypes } = require('sequelize');
@@ -8,41 +5,36 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('user_workspaces', {
+    await queryInterface.createTable('boards', {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-      },
       workspace_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'workspaces',
-          key: 'id',
-        },
+          key: 'id'
+        }
       },
-      status: {
-        type: DataTypes.ENUM('PENDING', 'ACCEPTED'),
+      project_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 'PENDING',
+        references: {
+          model: 'projects',
+          key: 'id'
+        }
       },
-      identity: {
+      label: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      last_login_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
+      position: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -56,11 +48,11 @@ module.exports = {
         type: DataTypes.DATE,
       },
     });
-    await queryInterface.addIndex('user_workspaces', ['identity'], {
+    await queryInterface.addIndex('boards', ['workspace_id', 'project_id', 'position'], {
       concurrently: true,
       unique: true,
       type: 'UNIQUE',
-      name: 'user_workspaces_identity',
+      name: 'project_user_workspace_workspace_id_project_id_position',
       where: {
         deleted_at: null,
       },
@@ -68,8 +60,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeIndex('user_workspaces', 'user_workspaces_identity');
-    await queryInterface.dropTable('user_workspaces');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_user_workspaces_status";');
-  },
+    await queryInterface.removeIndex('boards', 'project_user_workspace_workspace_id_project_id_position')
+    await queryInterface.dropTable('boards');
+  }
 };

@@ -36,7 +36,7 @@ export const port = mustExist(+process.env.PORT! as number, "PORT"),
   mailPassword = mustExist(process.env.MAIL_PASSWORD!, "MAIL_PASSWORD"),
   jwtClientId = mustExist(process.env.JWT_CLIENT_ID!, "JWT_CLENT_ID"),
   jwtClientSecret =  mustExist(process.env.JWT_CLIENT_SECRET!, "JWT_CLIENT_SECRET"),
-  accessTokenExpiresIn = '1h',
+  accessTokenExpiresIn = '7d',
   refreshTokenExpiresIn = '7d';
 
 export * from "./databaseInstance";

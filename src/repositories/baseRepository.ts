@@ -169,8 +169,8 @@ export abstract class BaseRepository<IT, RT> implements RepositoryWriter<IT, RT>
     return this.model.update(input, { where });
   }
 
-  deleteOne(id: number): Promise<number> {
-    return this.model.destroy({
+  deleteOne(id: number): Promise<number> {  
+      return this.model.destroy({
       where: { id },
     });
   }
