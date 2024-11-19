@@ -60,4 +60,8 @@ export class WorkspaceService {
 
     return this.repository.findOne({ where: where })
   }
+
+  public async findByPk(id: number): Promise<WorkspaceInterface> {
+    return this.repository.findByPk(id)
+  }
 }

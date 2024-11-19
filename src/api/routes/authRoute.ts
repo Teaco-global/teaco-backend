@@ -23,7 +23,7 @@ export class AuthRoute extends RouterClass {
         .post(exceptionHandler(AuthController.login))
 
     this.router
-        .route("/home")
-        .get(exceptionHandler(AuthController.home))
+        .route("/me")
+        .get(exceptionHandler(AuthController.authMe))
   }
 }

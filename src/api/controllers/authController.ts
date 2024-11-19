@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 
 import { InputUserInterface, UserInterface } from "../../interfaces";
-import { UsersService } from "../../services";
+import { UsersService, UserWorkspaceService } from "../../services";
 import { Authenticate, Validator } from "../../middlewares";
 import { login, resendVerificationCode, signUp, verifyAccount } from "../../validators";
 import { transporter } from "../../helpers";
 import { UsersStatusEnum } from "../../enums";
+import { WorkspaceService } from "../../services/workspaceService";
 
 export class AuthController {
   public constructor() {}
@@ -113,10 +114,15 @@ export class AuthController {
       },
     });
   }
-  static async home(req: Request, res: Response): Promise<Response> {
+  static async authMe(req: Request, res: Response): Promise<Response> {
     const user = (await Authenticate.verifyAccessToken(req.headers.authorization)).data as UserInterface;
+    const userWorkspace = await new UserWorkspaceService().findOne({userId: user.id})
+    const workspace = await new WorkspaceService().findByPk(userWorkspace.workspaceId)
     return res.status(200).json({
-        message: `Hello,  ${user.name}`,
+        data: {
+          user,
+          workspace
+        },      
     })
   }
 }
