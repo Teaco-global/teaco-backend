@@ -8,7 +8,7 @@ export class UserWorkspaceRoute extends RouterClass {
   }
 
   define(): void {
-    this.router.route("/workspace-login").get(exceptionHandler(UserWorkspaceController.workspaceLogin));
+    this.router.route("/workspace-login").post(exceptionHandler(UserWorkspaceController.workspaceLogin));
     this.router.route("/active-workspaces").get(exceptionHandler(UserWorkspaceController.activeWorkspaces))
     this.router.route("invite-member").post(exceptionHandler(UserWorkspaceController.inviteWorkspaceMember))
   }
