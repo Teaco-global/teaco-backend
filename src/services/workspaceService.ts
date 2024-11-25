@@ -11,7 +11,7 @@ import {
 } from "../repositories";
 
 export class WorkspaceService {
-  private repository;
+  private repository: WorkspaceRepository;
   private roleRepository;
   private userWorkspaceRepository;
   private userWorkspaceRoleRepository;
@@ -53,12 +53,12 @@ export class WorkspaceService {
     return workspace;
   }
 
-  public async findOne({secret}:{secret?: string}): Promise<WorkspaceInterface> {
+  public async findBySecret({secret}:{secret: string}): Promise<WorkspaceInterface> {
     let where: WhereOptions<any> = {};
 
     if(secret) where = { ...where, secret: secret }
 
-    return this.repository.findOne({ where: where })
+    return this.repository.findOne({ where })
   }
 
   public async findByPk(id: number): Promise<WorkspaceInterface> {

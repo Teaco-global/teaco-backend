@@ -3,8 +3,6 @@ import { IrouteInteface } from "../../interfaces/IRouteInterface";
 import { AuthRoute } from "./authRoute";
 import { UserWorkspaceRoute } from "./userWorkspaceRoute";
 import { ProjectRoute } from "./projectRoute";
-import { SprintRoute } from "./sprintRoute";
-import { IssueRoute } from "./issueRoute";
 
 class ProxyRouter {
   private static instance: ProxyRouter;
@@ -23,14 +21,6 @@ class ProxyRouter {
       segment: "/project",
       provider: ProjectRoute,
     },
-    {
-      segment: "/sprint",
-      provider: SprintRoute,
-    },
-    {
-        segment: "/issue",
-        provider: IssueRoute
-    }
   ];
 
   private constructor() {}

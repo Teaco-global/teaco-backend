@@ -32,7 +32,6 @@ const Sprint = sequelize.define(
     },
     goal: {
       type: Sequelize.TEXT,
-      allowNull: false,
     },
     status: {
       type: Sequelize.ENUM(

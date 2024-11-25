@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { InputProjectInterface, UserInterface } from "../../interfaces";
-import { ProjectService } from "../../services";
+import { ColumnService, ProjectService, SprintService } from "../../services";
 import { Authenticate } from "../../middlewares";
 import { ProjectStatusEnum } from "../../enums";
 
@@ -12,7 +12,7 @@ export class ProjectController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
@@ -25,17 +25,17 @@ export class ProjectController {
   }
 
   static async getSingleProject(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { projectId } = req.params;
 
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-    const project = await new ProjectService().findByPk(+id)
+    const project = await new ProjectService().findByPk(+projectId)
     return res.status(200).json({
       message: "Project fetched successfully.",
       data: project
@@ -43,12 +43,12 @@ export class ProjectController {
   }
 
   static async createProject(req: Request, res: Response): Promise<Response> {
-    const { name, description, sprintDuration } = req.body as InputProjectInterface;
+    const { name, description } = req.body as InputProjectInterface;
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
@@ -57,8 +57,13 @@ export class ProjectController {
       name: name,
       description: description,
       createdById: userWorkspace.id,
-      sprintDuration: sprintDuration
     });
+    
+    await new SprintService().create({
+      projectId: project.id,
+      workspaceId: userWorkspace.workspace.id,
+      sprintCount: 1
+    })
 
     return res.status(200).json({
       message: "Project created successfully.",
@@ -72,7 +77,7 @@ export class ProjectController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
@@ -93,7 +98,7 @@ export class ProjectController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 

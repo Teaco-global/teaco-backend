@@ -1,7 +1,5 @@
 import * as Sequelize from "sequelize";
 import { Database } from "../config";
-import Project from "./projects";
-import Workspace from "./workspace";
 const sequelize = Database.sequelize;
 
 const ProjectUserWorkspace = sequelize.define(
@@ -16,7 +14,7 @@ const ProjectUserWorkspace = sequelize.define(
     workspaceId: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      references: {
+      references: { 
         model: "workspaces",
         key: "id",
       },

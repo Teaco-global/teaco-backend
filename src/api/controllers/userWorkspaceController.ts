@@ -50,7 +50,7 @@ export class UserWorkspaceController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 

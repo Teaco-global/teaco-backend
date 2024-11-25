@@ -44,6 +44,8 @@ export class IssueService {
     id: number;
     input: Partial<InputIssueInterface>;
   }): Promise<IssueInterface> {
+    const issueExists = await this.repository.findByPk(id)
+    if (!issueExists) throw new Error('Issue does not exists') 
     await this.repository.updateOne({ id, input });
 
     return this.repository.findByPk(id);

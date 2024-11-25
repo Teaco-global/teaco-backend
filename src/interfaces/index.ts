@@ -1,4 +1,4 @@
-export * from "./boardInterface"
+export * from "./columnsInterface"
 export * from "./IRouteInterface";
 export * from "./issueInterface";
 export * from "./projectInterface";

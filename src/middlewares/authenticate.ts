@@ -38,9 +38,10 @@ class Authenticate {
     }
   }
 
-  public async verifyWorkspace(secret, userId) {
+  public async verifyWorkspace(secret: string, userId: number) {
     try {
-      const workspace = await new WorkspaceService().findOne({secret: secret})
+      if (!secret) throw new Error()
+      const workspace = await new WorkspaceService().findBySecret({secret: secret})
 
       if(!workspace) throw new Error('Workspace does not exists.');
 
@@ -48,7 +49,7 @@ class Authenticate {
       
       return userWorkspace
     } catch (error) {
-      throw new Error(`Invalid workspace secret`)
+      throw new Error(`Invalid or missing workspace secret`)
     }
   }
 

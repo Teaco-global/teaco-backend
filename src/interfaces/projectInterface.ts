@@ -10,7 +10,6 @@ export interface InputProjectInterface {
   startDate?: Date;
   completedDate?: Date;
   status?: ProjectStatusEnum;
-  sprintDuration?: number;
 }
 
 export interface ProjectInterface

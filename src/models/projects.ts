@@ -1,7 +1,6 @@
 import * as Sequelize from "sequelize";
 import { Database } from "../config";
 import { ProjectStatusEnum } from "../enums";
-import Workspace from "./workspace";
 const sequelize = Database.sequelize;
 
 const Project = sequelize.define(
@@ -54,15 +53,7 @@ const Project = sequelize.define(
     completedDate: {
       type: Sequelize.DATE,
       field: "completed_date",
-    },
-    sprintDuration: {
-      type: Sequelize.INTEGER,
-      field: "sprint_duration",
-      allowNull: false,
-      validate: {
-        isIn: [[1, 2, 3, 4]],
-      }
-    },
+    }
   },
   {
     timestamps: true,

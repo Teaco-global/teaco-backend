@@ -8,17 +8,17 @@ import Project from "./projects";
 import ProjectUserWorkspace from "./projectUserWorkspace";
 import Sprint from "./sprint";
 import Issue from "./issue";
-import Story from "./story";
-import Board from "./board";
+import Column from "./columns";
+import IssueUserWorkspace from "./issueUserWorkspace";
 
 const Model = {
-  Board,
   Issue,
+  IssueUserWorkspace,
   Project,
   ProjectUserWorkspace,
   Role,
   Sprint,
-  Story,
+  Column,
   User,
   UserRole,
   UserWorkspace,

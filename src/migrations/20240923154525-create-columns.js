@@ -5,30 +5,18 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('boards', {
+    await queryInterface.createTable('columns', {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      workspace_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'workspaces',
-          key: 'id'
-        }
-      },
-      project_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'projects',
-          key: 'id'
-        }
-      },
       label: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      slug: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -48,11 +36,11 @@ module.exports = {
         type: DataTypes.DATE,
       },
     });
-    await queryInterface.addIndex('boards', ['workspace_id', 'project_id', 'position'], {
+    await queryInterface.addIndex('columns', ['slug'], {
       concurrently: true,
       unique: true,
       type: 'UNIQUE',
-      name: 'project_user_workspace_workspace_id_project_id_position',
+      name: 'columns_slug',
       where: {
         deleted_at: null,
       },
@@ -60,7 +48,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeIndex('boards', 'project_user_workspace_workspace_id_project_id_position')
-    await queryInterface.dropTable('boards');
+    await queryInterface.removeIndex('columns', 'slug');
+    await queryInterface.dropTable('columns');
   }
 };

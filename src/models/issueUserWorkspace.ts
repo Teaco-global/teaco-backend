@@ -1,9 +1,10 @@
 import * as Sequelize from "sequelize";
 import { Database } from "../config";
+
 const sequelize = Database.sequelize;
 
-const Story = sequelize.define(
-  "stories",
+const IssueUserWorkspace = sequelize.define(
+  "issue_user_workspaces",
   {
     id: {
       allowNull: false,
@@ -20,14 +21,14 @@ const Story = sequelize.define(
       },
       field: "workspace_id",
     },
-    projectId: {
+    issueId: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: "projects",
+        model: "issues",
         key: "id",
       },
-      field: "project_id",
+      field: "issue_id",
     },
     assignedToId: {
       type: Sequelize.INTEGER,
@@ -38,56 +39,30 @@ const Story = sequelize.define(
       },
       field: "assigned_to_id",
     },
-    createdById: {
+    assignedById: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: "user_workspaces",
         key: "id",
       },
-      field: "created_by_id",
-    },
-    issueId: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: "issues",
-        key: "id",
-      },
-      field: "issue_id",
-    },
-    sprintId: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: "sprints",
-        key: "id",
-      },
-      field: "sprint_id",
-    },
-    boardId: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: "boards",
-        key: "id",
-      },
-      field: "board_id",
-    },
-    storyPoint: {
-      type: Sequelize.INTEGER,
-      field: "story_point",
-    },
-    description: {
-      type: Sequelize.TEXT,
-      allowNull: false,
+      field: "assigned_by_id",
     },
   },
   {
     timestamps: true,
     paranoid: true,
     underscored: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ["workspaceId", "issueId", "assignedToId"],
+        where: {
+          deleted_at: null,
+        },
+      },
+    ],
   }
 );
 
-export default Story;
+export default IssueUserWorkspace;

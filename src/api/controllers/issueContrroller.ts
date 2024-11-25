@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { UserInterface } from "../../interfaces";
+import { InputIssueInterface, UserInterface } from "../../interfaces";
 import { Authenticate } from "../../middlewares";
-import { IssueService } from "../../services";
+import { ColumnService, IssueService } from "../../services";
 
 export class IssueController {
   public constructor() {}
@@ -11,17 +11,28 @@ export class IssueController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-    const { projectId } = req.params;
-    const { type } = req.body;
+    console.log(userWorkspace.id);
 
+    const { projectId } = req.params;
+    const { type, title, parentId, description } = req.body;
+    let { columnId } = req.body;
+    if (!columnId) {
+      const defaultColumn = await new ColumnService().findDefaultColumn(+projectId)
+      columnId = defaultColumn.id
+    }
     const issue = await new IssueService().create({
       type: type,
       workspaceId: userWorkspace.workspace.id,
       projectId: +projectId,
+      title: title,
+      parentId: parentId,
+      createdById: userWorkspace.id,
+      columnId: columnId,
+      description: description
     });
 
     return res.status(200).json({
@@ -35,22 +46,30 @@ export class IssueController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
     const { projectId, issueId } = req.params;
-    const { type } = req.body;
+    const { type, title, description, status, columnId, sprintId } = req.body;
 
-    const issue = await new IssueService().create({
-      type: type,
-      workspaceId: userWorkspace.workspace.id,
-      projectId: +projectId,
+    const updateFields: Partial<InputIssueInterface> = {
+      type,
+      title,
+      description,
+      status,
+      columnId,
+      sprintId,
+    };
+
+    const updatedIssue = await new IssueService().updateOne({
+      id: Number(issueId),
+      input: updateFields,
     });
 
     return res.status(200).json({
       message: "Issue type updated successfully.",
-      data: issue,
+      data: updatedIssue,
     });
   }
 
@@ -59,32 +78,16 @@ export class IssueController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-    const { issueId } = req.params
+    const { issueId } = req.params;
 
-    await new IssueService().deleteOne(+issueId)
+    await new IssueService().deleteOne(+issueId);
 
     return res.status(200).json({
-        message: "Issue type removed successfully.",
-    });
-  }
-
-  static async getAllIssuesType(req: Request, res: Response): Promise<Response> {
-    const user = (
-      await Authenticate.verifyAccessToken(req.headers.authorization)
-    ).data as UserInterface;
-    const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
-      user.id
-    );
-    const { projectId } = req.params
-    const issues = await new IssueService().findAll({workspaceId: userWorkspace.workspace.id, projectId: +projectId})
-    return res.status(200).json({
-        message: "Issue type removed successfully.",
-        data: issues
+      message: "Issue type removed successfully.",
     });
   }
 }

@@ -5,7 +5,7 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('stories', {
+    await queryInterface.createTable('issue_user_workspaces', {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -20,60 +20,29 @@ module.exports = {
           key: 'id'
         }
       },
-      project_id: {
+      issue_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'projects',
-          key: 'id'
-        }
+          model: 'issues',
+          key: 'id',
+        },
       },
       assigned_to_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'user_workspaces',
-          key: 'id'
-        }
+          key: 'id',
+        },
       },
-      created_by_id: {
+      assigned_by_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'user_workspaces',
-          key: 'id'
-        }
-      },
-      issue_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'issues',
-          key: 'id'
-        }
-      },
-      sprint_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'sprints',
-          key: 'id'
-        }
-      },
-      board_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'boards',
-          key: 'id'
-        }
-      },
-      story_point: {
-        type: DataTypes.INTEGER
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: false
+          key: 'id',
+        },
       },
       created_at: {
         type: DataTypes.DATE,
@@ -86,10 +55,21 @@ module.exports = {
       deleted_at: {
         type: DataTypes.DATE,
       },
-    })
+    });
+
+    await queryInterface.addIndex('issue_user_workspaces', ['workspace_id', 'issue_id', 'assigned_to_id'], {
+      concurrently: true,
+      unique: true,
+      type: 'UNIQUE',
+      name: 'issue_user_workspace_workspace_id_issue_id_assigned_to_id',
+      where: {
+        deleted_at: null,
+      },
+    });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('stories');
-  }
+    await queryInterface.removeIndex('issue_user_workspaces', 'issue_user_workspace_workspace_id_issue_id_user_workspace_id');
+    await queryInterface.dropTable('issue_user_workspaces');
+  },
 };

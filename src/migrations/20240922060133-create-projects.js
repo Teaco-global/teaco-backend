@@ -44,13 +44,6 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: false
       },
-      sprint_duration: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-          isIn: [[1, 2, 3, 4]],
-        }
-      },
       completed_date: {
         type: DataTypes.DATE
       },

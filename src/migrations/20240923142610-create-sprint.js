@@ -30,7 +30,6 @@ module.exports = {
       },
       goal: {
         type: DataTypes.TEXT,
-        allowNull: false,
       },
       status: {
         type: DataTypes.ENUM('STARTED', 'CREATED', 'COMPLETED', 'OVERDUED'),

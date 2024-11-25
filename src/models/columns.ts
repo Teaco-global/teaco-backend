@@ -2,8 +2,8 @@ import * as Sequelize from "sequelize";
 import { Database } from "../config";
 const sequelize = Database.sequelize;
 
-const Board = sequelize.define(
-  "boards",
+const Column = sequelize.define(
+  "columns",
   {
     id: {
       allowNull: false,
@@ -11,25 +11,11 @@ const Board = sequelize.define(
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    workspaceId: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: "workspaces",
-        key: "id",
-      },
-      field: "workspace_id",
-    },
-    projectId: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: "projects",
-        key: "id",
-      },
-      field: "project_id",
-    },
     label: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    slug: {
       type: Sequelize.STRING,
       allowNull: false,
     },
@@ -45,7 +31,7 @@ const Board = sequelize.define(
     indexes: [
       {
         unique: true,
-        fields: ["workspaceId", "projectId", "position"],
+        fields: ['slug'],
         where: {
           deleted_at: null,
         },
@@ -54,4 +40,4 @@ const Board = sequelize.define(
   }
 );
 
-export default Board;
+export default Column;

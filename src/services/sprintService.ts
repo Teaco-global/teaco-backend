@@ -4,7 +4,7 @@ import { SpritntRepository } from "../repositories";
 import { SprintStatusEnum } from "../enums";
 
 export class SprintService {
-  private repository;
+  private repository: SpritntRepository;
   constructor() {
     this.repository = new SpritntRepository();
   }
@@ -13,7 +13,7 @@ export class SprintService {
     return this.repository.findByPk(id);
   }
 
-  public async findOne({ status, projectId }: {status: SprintStatusEnum, projectId: number}) : Promise<SprintInterface> {
+  public async findOne({ status, projectId }: {status?: SprintStatusEnum, projectId?: number}) : Promise<SprintInterface> {
     let where: WhereOptions<any> = {};
 
     if (projectId) where = {...where, projectId: projectId}
@@ -21,6 +21,15 @@ export class SprintService {
     return this.repository.findOne({
       where: where
     })
+  }
+
+  public async findLastSprint({ projectId }: { projectId: number }): Promise<SprintInterface | null> {
+    return this.repository.findOne({
+      where: {
+        projectId: projectId,
+      },
+      order: [['sprintCount', 'DESC']],
+    });
   }
   public async create(input: InputSprintInterface): Promise<SprintInterface> {
     return this.repository.create(input);
@@ -42,7 +51,8 @@ export class SprintService {
     });
   }
 
-  public async updateOne({ id, input }: { id: number, input: Partial<InputSprintInterface>}) {
-    return this.repository.updateOne({ id, input })
+  public async updateOne({ id, input }: { id: number, input: Partial<InputSprintInterface>}): Promise<SprintInterface> {
+    await this.repository.updateOne({ id, input })
+    return this.repository.findByPk(id)
   }
 }

@@ -4,10 +4,14 @@ import morgan from "morgan";
 import { ProxyRouter } from "./api/routes";
 import cors from "cors";
 
-let corsOptions = {
+const corsOptions = {
   origin: "*",
   methods: "GET,POST,PUT,DELETE",
-  allowedHeaders: "Content-Type,Authorization",
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "x-workspace-secret-id",
+  ],
   credentials: true,
 };
 class Server {

@@ -5,7 +5,7 @@ import { ModelTimestampExtend } from "./timestampInterface";
 export interface InputSprintInterface {
   workspaceId: number;
   projectId: number;
-  goal: string;
+  goal?: string;
   status?: SprintStatusEnum;
   sprintCount: number;
   startDate?: Date;

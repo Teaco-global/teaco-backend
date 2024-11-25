@@ -2,74 +2,65 @@ import { Request, Response } from "express";
 import { Authenticate } from "../../middlewares";
 import { UserInterface } from "../../interfaces";
 import { SprintService } from "../../services";
-import { ProjectService } from "../../services";
 import { SprintStatusEnum } from "../../enums";
 
 export class SprintController {
   public constructor() {}
 
-  static async createSprint(req: Request, res: Response): Promise<Response> {
-    const { projectId } = req.params;
-    const { goal } = req.body;
+  static async createSprint (req: Request, res: Response): Promise<Response> {
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-    const project = await new ProjectService().findByPk(+projectId);
-    const startDate = new Date();
-    const dueDate = new Date(startDate);
-    dueDate.setDate(startDate.getDate() + project.sprintDuration * 7);
-    const sprints = await new SprintService().findAll({workspaceId: userWorkspace.workspace.id, projectId: +projectId})
-
-    const maxSprintCount = sprints.reduce((max, sprint) => Math.max(max, sprint.sprintCount), 0);
-
+    const { projectId } = req.params
+    const createdSprintExists = await new SprintService().findOne({ projectId: +projectId, status: SprintStatusEnum.CREATED })
+    if ( createdSprintExists ) throw new Error(`Please start and complete the SPRINT ${createdSprintExists.sprintCount} to start the new sprint.`)
+    const lastSprint = await new SprintService().findLastSprint({ projectId: +projectId })
     const sprint = await new SprintService().create({
       workspaceId: userWorkspace.workspace.id,
       projectId: +projectId,
-      sprintCount: maxSprintCount + 1,
-      goal: goal,
-    });
+      sprintCount: lastSprint.sprintCount + 1
+    })
+
 
     return res.status(200).send({
-      message: "Sprint created successfully.",
+      message: "Sprint started successfully.",
       data: sprint
-    });
+    })
   }
 
   static async startSprint(req: Request, res: Response): Promise<Response> {
     const {projectId, sprintId} = req.params
+    const {dueDate, goal} = req.body
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-    const project = await new ProjectService().findByPk(+projectId);
-    const sprints = await new SprintService().findAll({
-      workspaceId: userWorkspace.workspace.id,
-      projectId: +projectId
-    })
-    sprints.forEach((sprint) => {
-      if (sprint.status === SprintStatusEnum.STARTED && sprint.id !== +sprintId) {
-        throw new Error('Please complete the ongoing sprint to start the new sprint');
-      }
-    });
-    const startDate = new Date();
-    const dueDate = new Date(startDate);
-    dueDate.setDate(startDate.getDate() + project.sprintDuration * 7);
+    const startedSprintExists = await new SprintService().findOne({ status: SprintStatusEnum.STARTED, projectId: +projectId })
+    if (startedSprintExists) throw new Error(`Please complete the SPRINT ${startedSprintExists.sprintCount} to start the new sprint.`)
+
     const sprint = await new SprintService().updateOne({
       id: +sprintId, 
       input: {
-        startDate: startDate,
-        dueDate: dueDate,
+        goal: goal,
+        startDate: new Date(),
+        dueDate: new Date(dueDate),
         status: SprintStatusEnum.STARTED
       }
+    })
+
+    await new SprintService().create({
+      projectId: +projectId,
+      workspaceId: userWorkspace.workspace.id,
+      sprintCount: sprint.sprintCount + 1
     })
 
     return res.status(200).send({
@@ -84,9 +75,13 @@ export class SprintController {
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
+
+    const startedSprintExists = await new SprintService().findByPk(+sprintId)
+
+    if (startedSprintExists.status != SprintStatusEnum.STARTED || SprintStatusEnum.OVERDUED) throw new Error(`The sprint is in "${startedSprintExists.status}" state.`)
 
     await new SprintService().updateOne({
       id: +sprintId, 
@@ -104,48 +99,41 @@ export class SprintController {
     });
   }
 
-  static async currentSprint(req: Request, res: Response): Promise<Response> {
+  static async activeSprint(req: Request, res: Response): Promise<Response> {
     const { projectId } = req.params
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-    const sprint = await new SprintService().findOne({ status: SprintStatusEnum.STARTED || SprintStatusEnum.OVERDUED, projectId: +projectId })
-
-    if (!sprint) {
-      return res.status(200).send({
-        message: "No sprint has been started.",
-      });
-    }
+    const sprint = await new SprintService().findOne({ status: SprintStatusEnum.STARTED, projectId: +projectId })
 
     return res.status(200).send({
-      message: "Current sprint fetched successfully.",
+      message: "Active sprint fetched successfully.",
       data: sprint
     });
   }
 
-  static async allSprints(req: Request, res: Response): Promise<Response> {
+  static async createdSprint(req: Request, res: Response): Promise<Response> {
     const { projectId } = req.params
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
     const userWorkspace = await Authenticate.verifyWorkspace(
-      req.headers?.["x-workspace-secret-id"],
+      req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
 
-
-    const sprints = await new SprintService().findAll({
-      workspaceId: userWorkspace.workspace.id,
+    const sprint = await new SprintService().findOne({
+      status: SprintStatusEnum.CREATED,
       projectId: +projectId
     })
     return res.status(200).send({
-      message: "All sprints fetched successfully.",
-      data: sprints
+      message: "Created sprint fetched successfully.",
+      data: sprint
     });
   }
 }

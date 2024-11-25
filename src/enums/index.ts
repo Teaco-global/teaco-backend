@@ -1,3 +1,4 @@
+export * from './issueEnum';
 export * from "./projectEnum";
 export * from "./roleEnum";
 export * from "./sprintEnum";
