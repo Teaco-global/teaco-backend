@@ -8,7 +8,7 @@ export interface InputUserInterface {
   password: string;
   workspaceName?: string;
   //   status: UsersStatusEnum;
-  //   verificationCode: number;
+  verificationCode?: number;
 }
 
 export interface UserInterface extends InputUserInterface, ModelTimestampExtend {

@@ -20,6 +20,28 @@ export class IssueService {
     return issue;
   }
 
+  public async findAllActiveSprintIssues({sprintId, projectId}: {sprintId: number, projectId: number}): Promise<IssueInterface[]> {
+    return this.repository.findAll({
+      where: {
+        projectId: projectId,
+        sprintId: sprintId
+      }
+    })
+  }
+
+  public async findBacklogIssues({
+    projectId,
+  }: {
+    projectId: number;
+  }): Promise<IssueInterface[]> {
+    return this.repository.findAll({
+      where: {
+        projectId: projectId,
+        sprintId: null
+      }
+    })
+  }
+
   public async findAll({
     workspaceId,
     projectId,

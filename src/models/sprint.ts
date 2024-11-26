@@ -1,6 +1,7 @@
 import * as Sequelize from "sequelize";
 import { Database } from "../config";
 import { SprintStatusEnum } from "../enums";
+import Issue from "./issue";
 const sequelize = Database.sequelize;
 
 const Sprint = sequelize.define(
@@ -67,5 +68,15 @@ const Sprint = sequelize.define(
     underscored: true,
   }
 );
+
+Sprint.hasMany(Issue, {
+  foreignKey: 'sprintId',
+  as: 'issues'
+})
+
+Issue.belongsTo(Sprint, {
+  foreignKey: 'sprintId',
+  as: 'issues'
+})
 
 export default Sprint;

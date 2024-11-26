@@ -93,7 +93,7 @@ export class ProjectController {
   }
 
   static async deleteProject(req: Request, res: Response): Promise<Response> {
-    const { id }  = req.params
+    const { projectId }  = req.params
     const user = (
       await Authenticate.verifyAccessToken(req.headers.authorization)
     ).data as UserInterface;
@@ -101,8 +101,12 @@ export class ProjectController {
       req.headers?.["x-workspace-secret-id"] as string,
       user.id
     );
-
-    await new ProjectService().deleteOne(+id);
+    try {
+      await new ProjectService().deleteOne(+projectId);
+    } catch(err) {
+      // console.log(err)
+      throw new Error(err)
+    }
     return res.status(200).json({
       message: "Project deleted.",
     });

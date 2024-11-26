@@ -54,6 +54,7 @@ export class ProjectService {
         projectId: id,
       },
     });
-    return this.repository.deleteOne(id);
+    await this.repository.deleteOne(id);
+    return true
   }
 }

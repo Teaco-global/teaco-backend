@@ -11,13 +11,15 @@ export class ColumnService {
   }
 
   public async findAll(): Promise<ColumnInterface[]> {
-    return this.repository.findAll({})
+    return this.repository.findAll({
+      order: [['position', 'ASC']]
+  })
   }
 
   public async create(input: InputColumnInterface): Promise<ColumnInterface> {
     const column = await this.repository.create(input);
 
-    return column
+    return column 
   }
 
   public async updateOne({id, input}:{id: number, input: Partial<InputColumnInterface>}) {

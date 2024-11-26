@@ -18,6 +18,7 @@ export class ProjectRoute extends RouterClass {
     // Sprints
     this.router.route("/:projectId/sprints/created").get(exceptionHandler(SprintController.createdSprint)); // Get all sprints for a project
     this.router.route("/:projectId/sprints/active").get(exceptionHandler(SprintController.activeSprint)); // Get active sprint for a project
+    this.router.route("/:projectId/backlogs").get(exceptionHandler(SprintController.backlogIssues)); // Get all sprints for a project
     this.router.route("/:projectId/sprints/").post(exceptionHandler(SprintController.createSprint)); // Create a sprint for a project
     this.router.route("/:projectId/sprints/:sprintId/start").put(exceptionHandler(SprintController.startSprint)); // Start a sprint
     this.router.route("/:projectId/sprints/:sprintId/end").put(exceptionHandler(SprintController.endSprint)); // End a sprint

@@ -8,7 +8,10 @@ export class AuthRoute extends RouterClass {
   }
 
   define(): void {
-    this.router.route("/sign-up").post(exceptionHandler(AuthController.signUp));
+    // Define routes for authentication operations
+    this.router
+      .route("/sign-up")
+      .post(exceptionHandler(AuthController.signUp));
 
     this.router
       .route("/verify-account")
@@ -17,13 +20,13 @@ export class AuthRoute extends RouterClass {
     this.router
       .route("/resend-verification-code")
       .post(exceptionHandler(AuthController.resendVerificationCode));
-    
-    this.router
-        .route("/login")
-        .post(exceptionHandler(AuthController.login))
 
     this.router
-        .route("/me")
-        .get(exceptionHandler(AuthController.authMe))
+      .route("/login")
+      .post(exceptionHandler(AuthController.login));
+
+    this.router
+      .route("/me")
+      .get(exceptionHandler(AuthController.authMe));
   }
 }

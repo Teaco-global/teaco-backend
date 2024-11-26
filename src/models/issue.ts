@@ -1,6 +1,7 @@
 import * as Sequelize from "sequelize"; // Assuming direct Sequelize import
 import { Database } from "../config"; // Assuming Database holds connection details
 import { IssueStatusEnum, IssueTypeEnum } from "../enums";
+import Sprint from "./sprint";
 
 const sequelize = Database.sequelize;
 

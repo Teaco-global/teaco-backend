@@ -94,6 +94,7 @@ export class UsersService {
   }): Promise<UserInterface> {
     let where: WhereOptions<any> = {};
 
-    return this.repository.updateOne({id, input});
+    await this.repository.updateOne({id, input});
+    return this.repository.findByPk(id)
   }
 }

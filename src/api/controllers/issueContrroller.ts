@@ -15,25 +15,28 @@ export class IssueController {
       user.id
     );
 
-    console.log(userWorkspace.id);
-
     const { projectId } = req.params;
-    const { type, title, parentId, description } = req.body;
+    const { type, title, parentId, description, sprintId } = req.body;
     let { columnId } = req.body;
     if (!columnId) {
-      const defaultColumn = await new ColumnService().findDefaultColumn(+projectId)
-      columnId = defaultColumn.id
+      columnId = 1 //TODO: replace this hardcode value
     }
-    const issue = await new IssueService().create({
-      type: type,
-      workspaceId: userWorkspace.workspace.id,
-      projectId: +projectId,
-      title: title,
-      parentId: parentId,
-      createdById: userWorkspace.id,
-      columnId: columnId,
-      description: description
-    });
+    let issue 
+    try{
+      issue = await new IssueService().create({
+        type: type,
+        workspaceId: userWorkspace.workspace.id,
+        projectId: +projectId,
+        title: title,
+        parentId: parentId,
+        createdById: userWorkspace.id,
+        columnId: columnId,
+        description: description,
+        sprintId: sprintId
+      });
+    } catch(err) {
+      console.error(err)
+    }
 
     return res.status(200).json({
       message: "Issue type created successfully.",

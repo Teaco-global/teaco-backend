@@ -15,7 +15,7 @@ class Authenticate {
     return Authenticate.instance;
   }
 
-  public async generateAcessToken(payload) {
+  public async generateAcessToken(payload: any) {
     const options: SignOptions = {
       expiresIn: accessTokenExpiresIn,
       algorithm: "HS512"
@@ -28,7 +28,7 @@ class Authenticate {
     );
   }
 
-  public async verifyAccessToken(token) {
+  public async verifyAccessToken(token: string) {
     try {
       const decoded = jwt.verify(token, jwtClientSecret);
       return { success: true, data: decoded };

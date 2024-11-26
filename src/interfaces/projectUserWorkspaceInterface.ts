@@ -6,7 +6,7 @@ export interface InputProjectUserWorkspaceInterface {
   assignedToId: number;
   assignedById: number;
   projectId: number;
-  assignedAt: string;
+  assignedAt: Date;
 }
 
 export interface ProjectUserWorkspaceInterface

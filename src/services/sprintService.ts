@@ -2,6 +2,7 @@ import { WhereOptions } from "sequelize";
 import { InputSprintInterface, SprintInterface } from "../interfaces";
 import { SpritntRepository } from "../repositories";
 import { SprintStatusEnum } from "../enums";
+import Model from "../models";
 
 export class SprintService {
   private repository: SpritntRepository;
@@ -9,8 +10,15 @@ export class SprintService {
     this.repository = new SpritntRepository();
   }
 
-  public async findByPk(id): Promise<SprintInterface> {
-    return this.repository.findByPk(id);
+  public async findByPk(id: number): Promise<SprintInterface> {
+    return this.repository.findByPk(id, {
+      include: [
+        {
+          model: Model.Issue,
+          as: 'issues'
+        }
+      ]
+    });
   }
 
   public async findOne({ status, projectId }: {status?: SprintStatusEnum, projectId?: number}) : Promise<SprintInterface> {
@@ -18,9 +26,17 @@ export class SprintService {
 
     if (projectId) where = {...where, projectId: projectId}
     if (status) where = { ...where, status: status}
-    return this.repository.findOne({
-      where: where
+    const sprint = await this.repository.findOne({
+      where: where,
+      include: [
+        {
+          model: Model.Issue,
+          as: 'issues'
+        }
+      ]
     })
+
+    return sprint
   }
 
   public async findLastSprint({ projectId }: { projectId: number }): Promise<SprintInterface | null> {

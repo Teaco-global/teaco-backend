@@ -1,6 +1,7 @@
 import * as Sequelize from "sequelize";
 import { SprintStatusEnum } from "../enums";
 import { ModelTimestampExtend } from "./timestampInterface";
+import { IssueInterface } from "./issueInterface";
 
 export interface InputSprintInterface {
   workspaceId: number;
@@ -14,7 +15,10 @@ export interface InputSprintInterface {
 }
 
 export interface SprintInterface extends InputSprintInterface, ModelTimestampExtend {
-    id: number;
+  id: number;
+  issues?: IssueInterface[];
+  issuesCount?: number;
+  daysLeft?: number;
 }
 
 export interface SprintModelInterface
