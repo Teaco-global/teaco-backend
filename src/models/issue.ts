@@ -32,6 +32,11 @@ const Issue = sequelize.define(
       },
       field: "project_id",
     },
+    issueCount: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      field: "issue_count"
+    },
     title: {
       type: Sequelize.STRING(255),
       allowNull: false,
@@ -101,6 +106,22 @@ const Issue = sequelize.define(
         key: "id",
       },
       field: "created_by_id",
+    },
+    assignedById: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: "user_workspaces",
+        key: "id",
+      },
+      field: "assigned_by_id",
+    },
+    assignedToId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: "user_workspaces",
+        key: "id",
+      },
+      field: "assigned_to_id",
     },
   },
   {

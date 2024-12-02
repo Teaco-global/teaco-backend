@@ -1,10 +1,27 @@
 import { Request, Response } from "express";
 import { InputIssueInterface, UserInterface } from "../../interfaces";
 import { Authenticate } from "../../middlewares";
-import { ColumnService, IssueService } from "../../services";
+import { IssueService } from "../../services";
 
 export class IssueController {
   public constructor() {}
+
+  static async getIssue(req: Request, res: Response): Promise<Response> {
+    const user = (
+      await Authenticate.verifyAccessToken(req.headers.authorization)
+    ).data as UserInterface;
+    await Authenticate.verifyWorkspace(
+      req.headers?.["x-workspace-secret-id"] as string,
+      user.id
+    );
+
+    const { issueId } = req.params;
+    const issue = await new IssueService().findByPk(+issueId)
+    return res.status(200).json({
+      message: "Issue type created successfully.",
+      data: issue,
+    });
+  }
 
   static async createIssue(req: Request, res: Response): Promise<Response> {
     const user = (
@@ -53,7 +70,7 @@ export class IssueController {
       user.id
     );
 
-    const { projectId, issueId } = req.params;
+    const { issueId } = req.params;
     const { type, title, description, status, columnId, sprintId } = req.body;
 
     const updateFields: Partial<InputIssueInterface> = {

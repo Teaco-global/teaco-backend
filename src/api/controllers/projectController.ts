@@ -104,7 +104,6 @@ export class ProjectController {
     try {
       await new ProjectService().deleteOne(+projectId);
     } catch(err) {
-      // console.log(err)
       throw new Error(err)
     }
     return res.status(200).json({

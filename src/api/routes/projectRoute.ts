@@ -27,6 +27,7 @@ export class ProjectRoute extends RouterClass {
     this.router.route("/:projectId/columns").get(exceptionHandler(ColumnsController.getColumns)); // Get all columns for a project
 
     // Issues
+    this.router.route("/:projectId/issues/:issueId").get(exceptionHandler(IssueController.getIssue)); // Get an issue
     this.router.route("/:projectId/issues").post(exceptionHandler(IssueController.createIssue)); // Create an issue for a project
     this.router.route("/:projectId/issues/:issueId").put(exceptionHandler(IssueController.updateIssue)); // Update an issue
     this.router.route("/:projectId/issues/:issueId").delete(exceptionHandler(IssueController.removeIssue)); // Delete an issue

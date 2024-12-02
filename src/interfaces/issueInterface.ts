@@ -7,12 +7,15 @@ export interface InputIssueInterface {
   projectId: number;
   type?: IssueTypeEnum;
   title: string;
+  issueCount?: number;
   description?: string;
   parentId?: number;
   status?: IssueStatusEnum;
   sprintId?: number;
   columnId?: number;
-  createdById: number 
+  createdById: number;
+  assignedToId?: number;
+  assignedById?: number; 
 }
 
 export interface IssueInterface extends InputIssueInterface, ModelTimestampExtend {

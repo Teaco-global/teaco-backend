@@ -9,6 +9,17 @@ export class IssueService {
   }
 
   public async create(input: InputIssueInterface): Promise<IssueInterface> {
+    const lastIssue = await this.repository.findOne({
+      where: {
+        projectId: input.projectId
+      },
+      order: [['createdAt', 'DESC']]
+    })
+    if(lastIssue) {
+      input.issueCount = lastIssue.issueCount + 1
+    } else {
+      input.issueCount = 1
+    }
     return this.repository.create(input);
   }
 

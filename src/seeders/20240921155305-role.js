@@ -22,6 +22,14 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         },
+        {
+          id: 3,
+          label: 'Admin',
+          slug: 'admin',
+          level: 0,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
       ],
       {},
     );

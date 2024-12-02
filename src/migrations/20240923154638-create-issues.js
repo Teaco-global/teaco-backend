@@ -43,6 +43,10 @@ module.exports = {
           key: 'id'
         }
       },
+      issue_count: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
       status: {
         type: DataTypes.ENUM('IN_BACKLOG', 'PENDING', 'COMPLETED'),
         defaultValue: 'IN_BACKLOG'
@@ -86,6 +90,20 @@ module.exports = {
       created_by_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: 'user_workspaces',
+          key: 'id',
+        },
+      },
+      assigned_to_id: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'user_workspaces',
+          key: 'id',
+        },
+      },
+      assigned_by_id: {
+        type: DataTypes.INTEGER,
         references: {
           model: 'user_workspaces',
           key: 'id',
