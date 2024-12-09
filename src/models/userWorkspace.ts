@@ -4,8 +4,6 @@ import { UserWorkspaceModelInterface } from "../interfaces/userWorkspaceInterfac
 import { Database } from "../config";
 import { UserWorkspaceStatusEnum } from "../enums";
 import UserWorkspaceRole from "./userWorkspaceRole";
-import ProjectUserWorkspace from "./projectUserWorkspace";
-import Project from "./projects";
 const sequelize = Database.sequelize;
 
 const UserWorkspace = sequelize.define<UserWorkspaceModelInterface>(

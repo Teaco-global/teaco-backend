@@ -5,7 +5,12 @@ import { Request, Response } from "express";
 import { InputUserInterface, UserInterface } from "../../interfaces";
 import { UsersService, UserWorkspaceService } from "../../services";
 import { Authenticate, Validator } from "../../middlewares";
-import { login, resendVerificationCode, signUp, verifyAccount } from "../../validators";
+import {
+  login,
+  resendVerificationCode,
+  signUp,
+  verifyAccount,
+} from "../../validators";
 import { transporter } from "../../helpers";
 import { UsersStatusEnum } from "../../enums";
 import { WorkspaceService } from "../../services/workspaceService";
@@ -14,20 +19,25 @@ export class AuthController {
   public constructor() {}
 
   static async signUp(req: Request, res: Response): Promise<Response> {
-    
-    const { name, email, password, workspaceName } = req.body as InputUserInterface;
+    const { name, email, password, workspaceName } =
+      req.body as InputUserInterface;
     Validator.check(signUp, { name, email, password });
 
-    const userExists = await new UsersService().findOne({email: email})
+    const userExists = await new UsersService().findOne({ email: email });
     if (userExists) {
       return res.status(409).json({
         error: {
           message: "User already exists.",
-          code: "CONFLICT"
-        }
+          code: "CONFLICT",
+        },
       });
     }
-    await new UsersService().createUserAndWorkspace({name, email, password, workspaceName})
+    await new UsersService().createUserAndWorkspace({
+      name,
+      email,
+      password,
+      workspaceName,
+    });
 
     return res.status(200).json({
       message: "User and workspace created successfully.",
@@ -62,7 +72,7 @@ export class AuthController {
     res: Response
   ): Promise<Response> {
     const { email } = req.body;
-    Validator.check(resendVerificationCode, { email })
+    Validator.check(resendVerificationCode, { email });
     const emailExists = await new UsersService().findOne({ email: email });
 
     if (!emailExists) throw new Error(`Email ${email} does not exists.`);
@@ -94,7 +104,7 @@ export class AuthController {
 
   static async login(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
-    Validator.check(login, { email, password })
+    Validator.check(login, { email, password });
     const userExists = await new UsersService().findOne({ email: email });
 
     if (!userExists) throw new Error(`User does not exists`);
@@ -115,14 +125,20 @@ export class AuthController {
     });
   }
   static async authMe(req: Request, res: Response): Promise<Response> {
-    const user = (await Authenticate.verifyAccessToken(req.headers.authorization)).data as UserInterface;
-    const userWorkspace = await new UserWorkspaceService().findOne({userId: user.id})
-    const workspace = await new WorkspaceService().findByPk(userWorkspace.workspaceId)
+    const user = (
+      await Authenticate.verifyAccessToken(req.headers.authorization)
+    ).data as UserInterface;
+    const userWorkspace = await new UserWorkspaceService().findOne({
+      userId: user.id,
+    });
+    const workspace = await new WorkspaceService().findByPk(
+      userWorkspace.workspaceId
+    );
     return res.status(200).json({
-        data: {
-          user,
-          workspace
-        },      
-    })
+      data: {
+        user,
+        workspace,
+      },
+    });
   }
 }

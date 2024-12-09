@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import * as Sequelize from "sequelize";
+import { SortEnum } from "../enums";
 
 dotenv.config();
 
@@ -37,6 +38,12 @@ export const port = mustExist(+process.env.PORT! as number, "PORT"),
   jwtClientId = mustExist(process.env.JWT_CLIENT_ID!, "JWT_CLENT_ID"),
   jwtClientSecret =  mustExist(process.env.JWT_CLIENT_SECRET!, "JWT_CLIENT_SECRET"),
   accessTokenExpiresIn = '7d',
-  refreshTokenExpiresIn = '7d';
+  refreshTokenExpiresIn = '7d',
+
+  pgMinLimit = 10,
+  pgMaxLimit = 1000,
+  /** Order */
+  defaultOrder = "id",
+  defaultSort = SortEnum.DESC
 
 export * from "./databaseInstance";
