@@ -9,6 +9,7 @@ import {
 } from "../repositories";
 import Model from "../models";
 import { RoleEnum, SortEnum } from "../enums";
+import { Ksuid } from "../helpers";
 
 export class UserWorkspaceService {
   private repository: UserWorkspaceRepository;
@@ -29,13 +30,13 @@ export class UserWorkspaceService {
     workspaceId: number;
     role: RoleEnum;
   }): Promise<UserWorkspaceInterface> {
-    const userWorkspace = await this.repository.create({ userId, workspaceId });
+    const userWorkspace = await this.repository.create({ userId, workspaceId, identity: Ksuid.generate() });
     const rolesExists = await this.roleRepository.findOne({
       where: {
         slug: role.toLocaleLowerCase(),
       },
     });
-    const userWorkspaceRole = this.userWorkspaceRoleRepository.create({
+    await this.userWorkspaceRoleRepository.create({
       userWorkspaceId: userWorkspace.id,
       roleId: rolesExists.id,
     });
@@ -56,7 +57,7 @@ export class UserWorkspaceService {
     if (userId) where = { ...where, userId: userId };
     if (workspaceId) where = { ...where, workspaceId: workspaceId };
     if (identity) where = { ...where, identity: identity };
-
+    console.log(where)
     return this.repository.findOne({
       where: where,
       include: [

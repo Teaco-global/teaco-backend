@@ -7,7 +7,7 @@ export interface InputUserInterface {
   email: string;
   password: string;
   workspaceName?: string;
-  //   status: UsersStatusEnum;
+  status?: UsersStatusEnum;
   verificationCode?: number;
 }
 

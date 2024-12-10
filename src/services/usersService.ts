@@ -5,12 +5,12 @@ import crypto from "crypto";
 import { InputUserInterface, UserInterface } from "../interfaces";
 import { saltRound } from "../config";
 import { UserRepository } from "../repositories/userRepository";
-import { WorkspaceRepository } from "../repositories";
 import { transporter } from "../helpers";
 import { WorkspaceService } from "./workspaceService";
+import { UsersStatusEnum } from "../enums";
 
 export class UsersService {
-  private repository;
+  private repository: UserRepository;
   constructor() {
     this.repository = new UserRepository;
   }
@@ -52,11 +52,13 @@ export class UsersService {
     email,
     password,
     verificationCode,
+    status
   }: {
     name?: string;
     email?: string;
     password?: string;
     verificationCode?: number;
+    status?: UsersStatusEnum
   }): Promise<UserInterface> {
     const emailExists = await this.repository.findOne({
       where: {
@@ -72,6 +74,7 @@ export class UsersService {
       email,
       password,
       verificationCode,
+      status
     });
   }
 
@@ -81,7 +84,7 @@ export class UsersService {
     if (email) where = { ...where, email: email };
 
     return this.repository.findOne({
-      where: where,
+      where,
     });
   }
 

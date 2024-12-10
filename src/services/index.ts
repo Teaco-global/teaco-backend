@@ -1,4 +1,5 @@
 export * from "./columnService";
+export * from './identityVerificationService';
 export * from "./issueService";
 export * from "./projectService";
 export * from "./sprintService";

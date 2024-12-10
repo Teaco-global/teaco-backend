@@ -1,5 +1,6 @@
 export * from "./baseRepository";
 export * from "./columnsRepository";
+export * from "./identityVerificationRepository";
 export * from "./issueRepository";
 export * from "./projectRepository";
 export * from "./projectUserWorkspaceRepository";

@@ -15,6 +15,7 @@ const mustExist = <T>(value: T | undefined, name: String): T => {
 
 export const port = mustExist(+process.env.PORT! as number, "PORT"),
   baseUrl = mustExist(process.env.BASE_URL as string, "BASE_URL"),
+  frontendBaseUrl = mustExist(process.env.FRONTEND_BASE_URL as string, "FRONTEND_BASE_URL"),
   db = {
     username: mustExist(process.env.DB_USER!, "DB_USER"),
     password: mustExist(process.env.DB_PASSWORD!, "DB_PASSWORD"),
@@ -44,6 +45,7 @@ export const port = mustExist(+process.env.PORT! as number, "PORT"),
   pgMaxLimit = 1000,
   /** Order */
   defaultOrder = "id",
-  defaultSort = SortEnum.DESC
+  defaultSort = SortEnum.DESC,
+  tokenExpireTime = 2
 
 export * from "./databaseInstance";

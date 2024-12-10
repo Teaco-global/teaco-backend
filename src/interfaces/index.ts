@@ -1,4 +1,5 @@
-export * from "./columnsInterface"
+export * from "./columnsInterface";
+export * from './identityVerificationInterface';
 export * from "./IRouteInterface";
 export * from "./issueInterface";
 export * from "./projectInterface";

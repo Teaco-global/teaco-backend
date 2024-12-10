@@ -10,8 +10,10 @@ import Sprint from "./sprint";
 import Issue from "./issue";
 import Column from "./columns";
 import IssueUserWorkspace from "./issueUserWorkspace";
+import IdentityVerification from "./indentityVerification";
 
 const Model = {
+  IdentityVerification,
   Issue,
   IssueUserWorkspace,
   Project,
