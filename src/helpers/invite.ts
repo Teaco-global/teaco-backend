@@ -1,5 +1,5 @@
 import { IdentityVerificationService } from "../services";
-import { UserWorkspaceInterface } from "../interfaces";
+import { IdentityVerificationInterface, UserWorkspaceInterface } from "../interfaces";
 import { Ksuid } from "./ksuid";
 import { transporter } from "./mailSender";
 import { frontendBaseUrl } from "../config";
@@ -41,6 +41,14 @@ class Helper {
     `,
     });
     return true;
+  }
+
+  public async verifyToken(token: string): Promise<IdentityVerificationInterface> {
+    const identityVerification = await new IdentityVerificationService().findOne({
+      token: token,
+      expiryDate: new Date(),
+    });
+    return identityVerification;
   }
 }
 

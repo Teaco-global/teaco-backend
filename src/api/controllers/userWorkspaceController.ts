@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+
 import { Authenticate, Validator } from "../../middlewares";
 import { workspaceLogin } from "../../validators";
 import { UserInterface, WorkspaceInterface } from "../../interfaces";
-import { UsersService, UserWorkspaceService } from "../../services";
+import { UsersService, UserWorkspaceService, WorkspaceService } from "../../services";
 import {
   pgMinLimit,
   pgMaxLimit,
   defaultOrder,
   defaultSort,
+  saltRound,
 } from "../../config";
 import { Helper } from "../../helpers/invite";
-import { UsersStatusEnum } from "../../enums";
+import { UsersStatusEnum, UserWorkspaceStatusEnum } from "../../enums";
 
 export class UserWorkspaceController {
   public constructor() {}
@@ -91,7 +94,6 @@ export class UserWorkspaceController {
         name: name,
         email: email,
         password: "Password@123",
-        status: UsersStatusEnum.VERFIED,
       });
       const newUserWorkspace = await new UserWorkspaceService().create({
         userId: newUser.id,
@@ -108,7 +110,56 @@ export class UserWorkspaceController {
       });
     } catch (error) {
       return res.status(500).json({
-        message: "An error occurred while trying to end the sprint.",
+        message: "An error occurred while inviting the member.",
+        error: error.message || "Unexpected error.",
+      });
+    }
+  }
+
+  static async acceptMemberInvite(req: Request, res: Response): Promise<Response> {
+    try {
+      const { token, password, accept } = req.body;
+
+      const identityVerification = await Helper.verifyToken(token)
+      console.log(identityVerification)
+      if (!identityVerification) {
+        return res.status(400).json({
+          message: 'Invalid token'
+        });
+      }
+
+      const userWorkspaceExists = await new UserWorkspaceService().findOne({
+        identity: identityVerification?.identity
+      })
+      const workspaceExists = await new WorkspaceService().findByPk(userWorkspaceExists.workspaceId)
+      const userExists = await new UsersService().findByPk(userWorkspaceExists.userId)
+
+      if (!userWorkspaceExists || !userExists || !workspaceExists) {
+        return res.status(400).json({
+          message: 'Invalid token'
+        })
+      }
+
+      await new UserWorkspaceService().updateOne(userWorkspaceExists.id, {
+        status: accept ? UserWorkspaceStatusEnum.ACCEPTED : UserWorkspaceStatusEnum.PENDING,
+      });
+
+      if (password) {
+        await new UsersService().updateOne({
+          id: userExists.id,
+          input: {
+            password: await bcrypt.hash(password, saltRound),
+            status: UsersStatusEnum.VERFIED
+          }
+        })
+      }
+      
+      return res.status(200).json({
+        message: 'Invitation accepted.'
+      })
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "An error occurred accepting the invite.",
         error: error.message || "Unexpected error.",
       });
     }

@@ -1,7 +1,7 @@
 import { WhereOptions } from "sequelize";
 import * as Sequelize from "sequelize";
 
-import { UserWorkspaceInterface } from "../interfaces";
+import { InputUserWorkspaceInterface, UserWorkspaceInterface } from "../interfaces";
 import {
   RoleRepository,
   UserWorkspaceRepository,
@@ -46,7 +46,7 @@ export class UserWorkspaceService {
   public async findOne({
     userId,
     workspaceId,
-    identity,
+    identity
   }: {
     userId?: number;
     workspaceId?: number;
@@ -172,6 +172,21 @@ export class UserWorkspaceService {
       limit,
       order: [...orderItem, [order, sort]],
       distinct: true,
+    });
+  }
+
+  async updateOne(
+    id: Sequelize.CreationOptional<number>,
+    input: Partial<InputUserWorkspaceInterface>,
+  ): Promise<number[]> {
+    if (id) {
+      const userExists = await this.repository.findByPk(id);
+      if (!userExists)
+        throw new Error('User does not exists.')
+    }
+    return this.repository.updateOne({
+      id: id,
+      input: input,
     });
   }
 }

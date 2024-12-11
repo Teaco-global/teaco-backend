@@ -33,7 +33,6 @@ class Authenticate {
       const decoded = jwt.verify(token, jwtClientSecret);
       return { success: true, data: decoded };
     } catch (error) {
-      console.error(`${error.name}`)
       throw new Error(error)
     }
   }
