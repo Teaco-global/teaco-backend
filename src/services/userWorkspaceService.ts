@@ -8,7 +8,7 @@ import {
   UserWorkspaceRoleRepository,
 } from "../repositories";
 import Model from "../models";
-import { RoleEnum, SortEnum } from "../enums";
+import { RoleEnum, SortEnum, UserWorkspaceStatusEnum } from "../enums";
 import { Ksuid } from "../helpers";
 
 export class UserWorkspaceService {
@@ -57,7 +57,6 @@ export class UserWorkspaceService {
     if (userId) where = { ...where, userId: userId };
     if (workspaceId) where = { ...where, workspaceId: workspaceId };
     if (identity) where = { ...where, identity: identity };
-    console.log(where)
     return this.repository.findOne({
       where: where,
       include: [
@@ -126,6 +125,7 @@ export class UserWorkspaceService {
     order,
     userId,
     workspaceId,
+    status
   }: {
     offset: number;
     limit: number;
@@ -133,6 +133,7 @@ export class UserWorkspaceService {
     order: string;
     userId?: number;
     workspaceId?: number;
+    status?: UserWorkspaceStatusEnum
   }): Promise<{
     count: number;
     rows: UserWorkspaceInterface[];
@@ -145,6 +146,7 @@ export class UserWorkspaceService {
     }
     if (userId) where = { ...where, userId: userId };
     if (workspaceId) where = { ...where, workspaceId: workspaceId };
+    if (status) where = { ...where, status: status };
 
     return this.repository.findAndCountAll({
       where,
@@ -188,5 +190,14 @@ export class UserWorkspaceService {
       id: id,
       input: input,
     });
+  }
+
+  async deleteOne({
+    id,
+  }:{
+    id: number
+  }): Promise<boolean> {
+    await this.repository.deleteOne(id)
+    return true
   }
 }

@@ -4,7 +4,12 @@ import bcrypt from "bcrypt";
 import { Authenticate, Validator } from "../../middlewares";
 import { workspaceLogin } from "../../validators";
 import { UserInterface, WorkspaceInterface } from "../../interfaces";
-import { UsersService, UserWorkspaceService, WorkspaceService } from "../../services";
+import {
+  UsersService,
+  UserWorkspaceRoleService,
+  UserWorkspaceService,
+  WorkspaceService,
+} from "../../services";
 import {
   pgMinLimit,
   pgMaxLimit,
@@ -84,10 +89,32 @@ export class UserWorkspaceController {
           userId: userExists.id,
           workspaceId: userWorkspace.workspace.id,
         });
-        if (userWorkspaceExists)
-          return res.status(400).json({
-            message: `User is already associated to this workspace`,
+        if (userWorkspaceExists) {
+          if (userWorkspaceExists.status === UserWorkspaceStatusEnum.ACCEPTED)
+            return res.status(400).json({
+              message: `User is already associated to this workspace`,
+            });
+          await Helper.sendInvitationLink({
+            userWorkspace: userWorkspaceExists,
+            email: email,
           });
+          return res.status(200).json({
+            message: "Member re-invited successfully.",
+          });
+        }
+        const newUserWorkspace = await new UserWorkspaceService().create({
+          userId: userExists.id,
+          workspaceId: userWorkspace.workspace.id,
+          role,
+        });
+        await Helper.sendInvitationLink({
+          userWorkspace: newUserWorkspace,
+          email: email,
+        });
+
+        return res.status(200).json({
+          message: "Member invited successfully.",
+        });
       }
 
       const newUser = await new UsersService().create({
@@ -116,32 +143,40 @@ export class UserWorkspaceController {
     }
   }
 
-  static async acceptMemberInvite(req: Request, res: Response): Promise<Response> {
+  static async acceptMemberInvite(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
     try {
       const { token, password, accept } = req.body;
 
-      const identityVerification = await Helper.verifyToken(token)
-      console.log(identityVerification)
+      const identityVerification = await Helper.verifyToken(token);
       if (!identityVerification) {
         return res.status(400).json({
-          message: 'Invalid token'
+          message: "Invalid token",
         });
       }
 
       const userWorkspaceExists = await new UserWorkspaceService().findOne({
-        identity: identityVerification?.identity
-      })
-      const workspaceExists = await new WorkspaceService().findByPk(userWorkspaceExists.workspaceId)
-      const userExists = await new UsersService().findByPk(userWorkspaceExists.userId)
+        identity: identityVerification?.identity,
+      });
+      const workspaceExists = await new WorkspaceService().findByPk(
+        userWorkspaceExists.workspaceId
+      );
+      const userExists = await new UsersService().findByPk(
+        userWorkspaceExists.userId
+      );
 
       if (!userWorkspaceExists || !userExists || !workspaceExists) {
         return res.status(400).json({
-          message: 'Invalid token'
-        })
+          message: "Invalid token",
+        });
       }
 
       await new UserWorkspaceService().updateOne(userWorkspaceExists.id, {
-        status: accept ? UserWorkspaceStatusEnum.ACCEPTED : UserWorkspaceStatusEnum.PENDING,
+        status: accept
+          ? UserWorkspaceStatusEnum.ACCEPTED
+          : UserWorkspaceStatusEnum.PENDING,
       });
 
       if (password) {
@@ -149,17 +184,62 @@ export class UserWorkspaceController {
           id: userExists.id,
           input: {
             password: await bcrypt.hash(password, saltRound),
-            status: UsersStatusEnum.VERFIED
-          }
-        })
+            status: UsersStatusEnum.VERFIED,
+          },
+        });
       }
-      
+
       return res.status(200).json({
-        message: 'Invitation accepted.'
-      })
+        message: "Invitation accepted.",
+      });
     } catch (error: any) {
       return res.status(500).json({
-        message: "An error occurred accepting the invite.",
+        message: "An error occurred while accepting the invite.",
+        error: error.message || "Unexpected error.",
+      });
+    }
+  }
+
+  static async removeWorkspaceMember(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
+    try {
+      const user = (
+        await Authenticate.verifyAccessToken(req.headers.authorization)
+      ).data as UserInterface;
+      const userWorkspace = await Authenticate.verifyWorkspace(
+        req.headers?.["x-workspace-secret-id"] as string,
+        user.id
+      );
+
+      const { userWorkspaceId } = req.body;
+
+      if (userWorkspaceId === userWorkspace.id) {
+        return res.status(400).json({
+          message: "You cannot remove yourself",
+        });
+      }
+
+      const userWorkspaceRole = await new UserWorkspaceRoleService().findOne({
+        userWorkspaceId,
+      });
+      if (userWorkspaceRole.role.slug === "owner")
+        return res.status(400).json({
+          message:
+            "You don't have privilege to remove the owner of the workspace.",
+        });
+
+      await new UserWorkspaceService().deleteOne({
+        id: userWorkspaceId,
+      });
+
+      return res.status(200).json({
+        message: "Workspace member removed successfully",
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "An error occurred while deleting the workspace member.",
         error: error.message || "Unexpected error.",
       });
     }
@@ -195,6 +275,42 @@ export class UserWorkspaceController {
 
     return res.status(200).json({
       message: "Workspace members fetched successfully",
+      data: rows,
+      count,
+    });
+  }
+
+  static async activeWorkspaceMembers(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
+    let { offset, limit, order, sort } = req.query as any;
+
+    offset = Number(offset) && Number(offset) > 0 ? Number(offset) - 1 : 0;
+    limit = limit ? limit : pgMinLimit;
+    limit = Math.min(limit, pgMaxLimit);
+    order = order ? order : defaultOrder;
+    sort = sort ? sort : defaultSort;
+
+    const user = (
+      await Authenticate.verifyAccessToken(req.headers.authorization)
+    ).data as UserInterface;
+    const userWorkspace = await Authenticate.verifyWorkspace(
+      req.headers?.["x-workspace-secret-id"] as string,
+      user.id
+    );
+
+    const { rows, count } = await new UserWorkspaceService().findAndCountAll({
+      offset,
+      limit,
+      order,
+      sort,
+      workspaceId: userWorkspace.workspace.id,
+      status: UserWorkspaceStatusEnum.ACCEPTED
+    });
+
+    return res.status(200).json({
+      message: "Active workspace members fetched successfully",
       data: rows,
       count,
     });
