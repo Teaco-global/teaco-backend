@@ -1,6 +1,6 @@
 import * as Sequelize from "sequelize";
 import { ProjectStatusEnum } from "../enums";
-import { ModelTimestampExtend } from "./timestampInterface";
+import { ModelTimestampExtend } from ".";
 
 export interface InputProjectInterface {
   workspaceId: number;

@@ -1,4 +1,5 @@
 export * from "./authController";
+export * from "./chatController";
 export * from "./columnsController";
 export * from "./issueContrroller";
 export * from "./projectController";

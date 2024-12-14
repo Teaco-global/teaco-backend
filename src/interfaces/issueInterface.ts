@@ -1,5 +1,5 @@
 import * as Sequelize from "sequelize";
-import { ModelTimestampExtend } from "./timestampInterface";
+import { ModelTimestampExtend } from ".";
 import { IssueStatusEnum, IssueTypeEnum } from "../enums";
 
 export interface InputIssueInterface {

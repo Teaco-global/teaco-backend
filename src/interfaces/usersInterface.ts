@@ -1,6 +1,6 @@
 import * as Sequelize from "sequelize";
 import { UsersStatusEnum } from "../enums";
-import { ModelTimestampExtend } from "./timestampInterface";
+import { ModelTimestampExtend } from ".";
 
 export interface InputUserInterface {
   name: string;

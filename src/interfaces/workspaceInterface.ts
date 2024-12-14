@@ -1,6 +1,5 @@
 import * as Sequelize from "sequelize";
-import { ModelTimestampExtend } from "./timestampInterface";
-import { InputUserWorkspaceInterface } from "./userWorkspaceInterface";
+import { InputUserWorkspaceInterface, ModelTimestampExtend } from ".";
 
 export interface InputWorkspaceInterface {
   label?: string;

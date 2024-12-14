@@ -3,6 +3,7 @@ import { IrouteInteface } from "../../interfaces/IRouteInterface";
 import { AuthRoute } from "./authRoute";
 import { UserWorkspaceRoute } from "./userWorkspaceRoute";
 import { ProjectRoute } from "./projectRoute";
+import { ChatRoute } from "./chatRoute";
 
 class ProxyRouter {
   private static instance: ProxyRouter;
@@ -20,6 +21,10 @@ class ProxyRouter {
     {
       segment: "/project",
       provider: ProjectRoute,
+    },
+    {
+      segment: "/chat",
+      provider: ChatRoute,
     },
   ];
 
