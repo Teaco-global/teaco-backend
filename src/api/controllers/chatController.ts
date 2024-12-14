@@ -93,6 +93,7 @@ export class ChatController {
         senderId,
         body
       });
+
       return res.status(200).send({
         message: "Message sent.",
         data: message
@@ -116,8 +117,7 @@ export class ChatController {
         user.id
       );
 
-      const { roomId } = req.params;
-      let { offset, limit, order, sort } = req.query as any;
+      let { roomId, offset, limit, order, sort } = req.query as any;
 
       offset = Number(offset) && Number(offset) > 0 ? Number(offset) - 1 : 0;
       limit = limit ? limit : pgMinLimit;
@@ -139,6 +139,7 @@ export class ChatController {
         data: rows
       });
     } catch (error: any) {
+      console.log(error)
       return res.status(500).json({
         message: "An error occurred while getting messages.",
         error: error.message || "Unexpected error.",

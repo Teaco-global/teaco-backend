@@ -3,6 +3,7 @@ import { Database, baseUrl, port } from "./config";
 import morgan from "morgan";
 import { ProxyRouter } from "./api/routes";
 import cors from "cors";
+import { SocketServer } from "./socket";
 
 const corsOptions = {
   origin: "*",
@@ -46,3 +47,4 @@ class Server {
 
 const server = new Server();
 server.start();
+SocketServer.start()

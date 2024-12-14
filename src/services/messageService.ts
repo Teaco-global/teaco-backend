@@ -17,7 +17,7 @@ export class MessageService {
     const messageData = await this.repository.create(input);
 
     return this.repository.findByPk(messageData.id, {
-      attributes: ["id", "body", "createdAt"],
+      attributes: ["id", "body", "senderId", "createdAt"],
       include: [
         {
           model: Model.UserWorkspace,
@@ -68,10 +68,12 @@ export class MessageService {
         {
           model: Model.UserWorkspace,
           as: "sender",
-        },
-        {
-          model: Model.User,
-          as: "user",
+          include: [
+            {
+              model: Model.User,
+              as: "user",
+            },
+          ]
         },
       ],
       offset,
