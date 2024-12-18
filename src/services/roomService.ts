@@ -24,7 +24,7 @@ export class RoomService {
     return roomExists;
   }
 
-  async query({
+  async checkCoupleRoomExists({
     workspaceId,
     userWorkspaceId,
     receiverId,
@@ -56,4 +56,42 @@ export class RoomService {
       { type: QueryTypes.SELECT }
     );
   }
+
+  async checkGroupRoomExists({
+    workspaceId,
+    userWorkspaceId,
+    receiverIds,
+  }: {
+    workspaceId: number;
+    userWorkspaceId: number;
+    receiverIds: number[]; // Change receiverId to an array of numbers
+  }): Promise<any> {
+    const formattedIds = receiverIds.join(","); // Convert array to comma-separated string
+    return await Database.sequelize.query(
+      `WITH RankedWorkspaces AS (
+        SELECT
+            room_id,
+            user_workspace_id,
+            workspace_id,
+            ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY room_id) AS rn
+        FROM
+            public.chat_room_user_workspaces
+        WHERE
+            workspace_id = ${workspaceId}
+            AND user_workspace_id IN (${userWorkspaceId}, ${formattedIds})
+      )
+      SELECT
+          aa.*
+      FROM
+          public.chat_room_user_workspaces aa
+      JOIN
+          RankedWorkspaces rw 
+          ON aa.room_id = rw.room_id 
+          AND rw.rn = ${receiverIds.length} 
+          AND aa.workspace_id = ${workspaceId}
+          AND aa.user_workspace_id IN (${userWorkspaceId}, ${formattedIds});`,
+      { type: QueryTypes.SELECT }
+    );
+  }
+  
 }

@@ -13,6 +13,7 @@ export interface RoomUserWorkspaceInterface extends ModelTimestampExtend {
   roomId: number;
   workspaceId: number;
   userWorkspaceId: number;
+  membersCount?: number;
 }
 
 export interface RoomsUserWorkspaceModelInterface

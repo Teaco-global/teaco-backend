@@ -27,7 +27,7 @@ export class ChatController {
         });
       }
 
-      const results = await new RoomService().query({
+      const results = await new RoomService().checkCoupleRoomExists({
         workspaceId: userWorkspace.workspace.id,
         userWorkspaceId: userWorkspace.id,
         receiverId: receiverId,
@@ -74,9 +74,84 @@ export class ChatController {
     }
   }
 
+  static async createChannel(req: Request, res: Response): Promise<Response> {
+    try {
+      const user = (
+        await Authenticate.verifyAccessToken(req.headers.authorization)
+      ).data as UserInterface;
+      const userWorkspace = await Authenticate.verifyWorkspace(
+        req.headers?.["x-workspace-secret-id"] as string,
+        user.id
+      );
+  
+      const { members, label, isPublic } = req.body;
+
+      console.log(members, label, isPublic)
+
+      if (!label || !Array.isArray(members) || members.length < 1) {
+        return res.status(400).json({
+          message: "Channel name and at least one participant are required.",
+        });
+      }
+
+      if (members.includes(userWorkspace.id)) {
+        return res.status(400).json({
+          message: "You cannot create a channel with only yourself as a participant.",
+        });
+      }
+
+      const uniquemembers = Array.from(
+        new Set([userWorkspace.id, ...members])
+      );
+  
+      const results = await new RoomService().checkGroupRoomExists({
+        workspaceId: userWorkspace.workspace.id,
+        userWorkspaceId: userWorkspace.id,
+        receiverIds: uniquemembers,
+      });
+  
+      if (results.length >= uniquemembers.length) {
+        const roomIds = results.map((item: any) => item.room_id);
+        const roomDetails = await new RoomService().findByPk(roomIds[0]);
+        return res.status(200).json({
+          message: "A channel with these participants already exists.",
+          data: roomDetails,
+        });
+      }
+  
+      const data = await new RoomService().create({
+        identity: `CH-${Ksuid.generate()}`,
+        type: RoomTypeEnum.group,
+        isPublic: isPublic,
+        updatedById: userWorkspace.id,
+        createdById: userWorkspace.id,
+        label: label,
+      });
+
+      await Promise.all(
+        uniquemembers.map(async (participantId: number) => {
+          await new RoomUserWorkspaceService().create({
+            roomId: data.id,
+            workspaceId: userWorkspace.workspaceId,
+            userWorkspaceId: participantId,
+          });
+        })
+      );
+  
+      return res.status(200).json({
+        message: "Channel created successfully.",
+        data: data
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "An error occurred while creating a channel.",
+        error: error.message || "Unexpected error.",
+      });
+    }
+  }
+
   static async sendMessage(req: Request, res: Response): Promise<Response> {
     try {
-
       const user = (
         await Authenticate.verifyAccessToken(req.headers.authorization)
       ).data as UserInterface;
@@ -106,9 +181,38 @@ export class ChatController {
     }
   }
 
+  static async assignedChannels(req: Request, res: Response): Promise<Response> {
+    try {
+      const user = (
+        await Authenticate.verifyAccessToken(req.headers.authorization)
+      ).data as UserInterface;
+      const userWorkspace = await Authenticate.verifyWorkspace(
+        req.headers?.["x-workspace-secret-id"] as string,
+        user.id
+      );
+      
+
+      const { rows, count } = await new RoomUserWorkspaceService().findAndCountAll({
+        userWorkspaceId: userWorkspace.workspaceId,
+        workspaceId: userWorkspace.workspace.id,
+        type: RoomTypeEnum.group
+      })
+      
+      return res.status(200).json({
+        message: "Assigned channels fetched successfully.",
+        data: rows,
+        count: count
+      })
+    } catch (error) {
+      return res.status(500).json({
+        message: "An error occurred while fetching assigned channels.",
+        error: error.message || "Unexpected error.",
+      });
+    }
+  }
+
   static async getMessages(req: Request, res: Response): Promise<Response> {
     try {
-
       const user = (
         await Authenticate.verifyAccessToken(req.headers.authorization)
       ).data as UserInterface;

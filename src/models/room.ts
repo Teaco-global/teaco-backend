@@ -2,6 +2,7 @@ import * as Sequelize from "sequelize";
 
 import { Database } from "../config";
 import { RoomTypeEnum } from "../enums";
+import RoomUserWorkspaces from "./roomUserWorkspace";
 
 const sequelize = Database.sequelize;
 
@@ -72,5 +73,15 @@ const Room = sequelize.define(
     ],
   }
 );
+
+Room.hasMany(RoomUserWorkspaces, {
+  foreignKey: "roomId",
+  as: "roomUserWorkspaces",
+});
+
+RoomUserWorkspaces.belongsTo(Room, {
+  foreignKey: "roomId",
+  as: "room",
+});
 
 export default Room;

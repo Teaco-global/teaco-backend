@@ -1,6 +1,8 @@
 import { IncludeOptions, WhereOptions } from "sequelize";
 import { RoomUserWorkspaceRepository } from "../repositories";
 import { RoomUserWorkspaceInterface, InputRoomUserWorkspaceInterface } from "../interfaces";
+import Model from "../models";
+import { RoomTypeEnum } from "../enums";
 
 export class RoomUserWorkspaceService {
   private repository: RoomUserWorkspaceRepository;
@@ -47,6 +49,38 @@ export class RoomUserWorkspaceService {
       where,
       include,
       distinct: distinct ?? true,
+    });
+  }
+
+  public async findAndCountAll({
+    workspaceId,
+    userWorkspaceId,
+    type,
+  }: {
+    workspaceId?: number;
+    userWorkspaceId?: number;
+    type?: RoomTypeEnum;
+  }): Promise<{
+    count: number;
+    rows: RoomUserWorkspaceInterface[];
+  }> {
+    let where: WhereOptions<any> = {},
+      roomWhere: WhereOptions<any> = {};
+
+    if (userWorkspaceId) where = { ...where, userWorkspaceId: userWorkspaceId };
+    if (workspaceId) where = { ...where, workspaceId: workspaceId };
+    if (type) roomWhere = { ...roomWhere, type: type}
+
+    return this.repository.findAndCountAll({
+      where,
+      include: [
+        {
+          model: Model.Room,
+          as: "room",
+          ...(Object.keys(roomWhere).length > 0 && { where: roomWhere }),
+        },
+      ],
+      distinct: true,
     });
   }
 }
