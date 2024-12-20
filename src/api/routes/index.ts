@@ -4,6 +4,7 @@ import { AuthRoute } from "./authRoute";
 import { UserWorkspaceRoute } from "./userWorkspaceRoute";
 import { ProjectRoute } from "./projectRoute";
 import { ChatRoute } from "./chatRoute";
+import { WikiRoute } from "./wikiRoute";
 
 class ProxyRouter {
   private static instance: ProxyRouter;
@@ -25,6 +26,10 @@ class ProxyRouter {
     {
       segment: "/chat",
       provider: ChatRoute,
+    },
+    {
+      segment: "/wiki",
+      provider: WikiRoute,
     },
   ];
 

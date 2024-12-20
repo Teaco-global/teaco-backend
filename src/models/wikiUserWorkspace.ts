@@ -1,12 +1,11 @@
 import * as Sequelize from "sequelize";
 
 import { Database } from "../config";
-import Room from "./room";
 
 const sequelize = Database.sequelize;
 
-const RoomUserWorkspaces = sequelize.define(
-  "chat_room_user_workspaces",
+const WikiUserWorkspace = sequelize.define(
+  "wiki_user_workspaces",
   {
     id: {
       type: Sequelize.INTEGER,
@@ -14,10 +13,10 @@ const RoomUserWorkspaces = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    roomId: {
+    wikiId: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      field: "room_id",
+      field: "wiki_id",
       references: {
         model: "chat_rooms",
         key: "id",
@@ -46,9 +45,9 @@ const RoomUserWorkspaces = sequelize.define(
     timestamps: true,
     paranoid: true,
     underscored: true,
-    tableName: "chat_room_user_workspaces",
+    tableName: "wiki_user_workspaces",
     freezeTableName: true,
   }
 );
 
-export default RoomUserWorkspaces;
+export default WikiUserWorkspace;

@@ -14,6 +14,8 @@ import IdentityVerification from "./indentityVerification";
 import Room from "./room";
 import RoomUserWorkspaces from "./roomUserWorkspace";
 import Message from "./message";
+import Wiki from "./wikis";
+import WikiUserWorkspace from "./wikiUserWorkspace";
 
 const Model = {
   Column,
@@ -31,6 +33,8 @@ const Model = {
   UserRole,
   UserWorkspace,
   UserWorkspaceRole,
+  Wiki,
+  WikiUserWorkspace,
   Workspace,
 };
 

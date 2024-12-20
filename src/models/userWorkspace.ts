@@ -4,6 +4,8 @@ import { UserWorkspaceModelInterface } from "../interfaces/userWorkspaceInterfac
 import { Database } from "../config";
 import { UserWorkspaceStatusEnum } from "../enums";
 import UserWorkspaceRole from "./userWorkspaceRole";
+import WikiUserWorkspace from "./wikiUserWorkspace";
+import Wiki from "./wikis";
 const sequelize = Database.sequelize;
 
 const UserWorkspace = sequelize.define<UserWorkspaceModelInterface>(
@@ -82,6 +84,30 @@ UserWorkspace.hasMany(UserWorkspaceRole, {
 UserWorkspaceRole.belongsTo(UserWorkspace, {
   foreignKey: "userWorkspaceId",
   as: "userWorkspace",
+});
+
+UserWorkspace.hasMany(WikiUserWorkspace, {
+  foreignKey: "userWorkspaceId",
+  as: "wikiUserWorkspaces",
+});
+
+WikiUserWorkspace.belongsTo(UserWorkspace, {
+  foreignKey: "userWorkspaceId",
+  as: "userWorkspace",
+});
+
+Wiki.belongsToMany(UserWorkspace, {
+  through: { model: WikiUserWorkspace },
+  as: "userWorkspaces",
+  foreignKey: "userWorkspaceId",
+  otherKey: "wikiId",
+});
+
+UserWorkspace.belongsToMany(Wiki, {
+  through: { model: WikiUserWorkspace },
+  as: "wikis",
+  foreignKey: "wikiId",
+  otherKey: "userWorkspaceId",
 });
 
 export default UserWorkspace;

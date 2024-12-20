@@ -5,3 +5,4 @@ export * from "./issueContrroller";
 export * from "./projectController";
 export * from "./sprintController";
 export * from "./userWorkspaceController";
+export * from "./wikiController";

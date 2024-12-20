@@ -15,4 +15,6 @@ export * from "./usersInterface";
 export * from "./userRoleInterface";
 export * from "./userWorkspaceInterface";
 export * from "./userWorkspaceRoleInterface";
+export * from "./wikiInterface";
+export * from "./wikiUserWorkspace";
 export * from "./workspaceInterface";

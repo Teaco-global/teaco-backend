@@ -2,6 +2,7 @@ import { RoomInterface, InputRoomInterface } from "../interfaces";
 import { RoomRepository } from "../repositories";
 import { Database } from "../config";
 import { QueryTypes } from "sequelize";
+import { RoomTypeEnum } from "../enums";
 
 export class RoomService {
   private repository: RoomRepository;
@@ -24,14 +25,16 @@ export class RoomService {
     return roomExists;
   }
 
-  async checkCoupleRoomExists({
+  async query({
     workspaceId,
     userWorkspaceId,
     receiverId,
+    type,
   }: {
     workspaceId: number;
     userWorkspaceId: number;
     receiverId: number;
+    type: RoomTypeEnum;
   }): Promise<any> {
     return await Database.sequelize.query(
       `WITH RankedWorkspaces AS (
@@ -93,5 +96,4 @@ export class RoomService {
       { type: QueryTypes.SELECT }
     );
   }
-  
 }

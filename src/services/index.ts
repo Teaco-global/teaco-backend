@@ -9,4 +9,6 @@ export * from "./sprintService";
 export * from "./usersService";
 export * from "./userWorkspaceRoleService";
 export * from "./userWorkspaceService";
+export * from "./wikiService";
+export * from "./wikiUserWorkspaceService";
 export * from "./workspaceService";

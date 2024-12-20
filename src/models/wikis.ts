@@ -1,13 +1,12 @@
 import * as Sequelize from "sequelize";
 
 import { Database } from "../config";
-import { RoomTypeEnum } from "../enums";
-import RoomUserWorkspaces from "./roomUserWorkspace";
+import WikiUserWorkspace from "./wikiUserWorkspace";
 
 const sequelize = Database.sequelize;
 
-const Room = sequelize.define(
-  "chat_rooms",
+const Wiki = sequelize.define(
+  "wikis",
   {
     id: {
       type: Sequelize.INTEGER,
@@ -15,29 +14,21 @@ const Room = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    label: {
+    title: {
       type: Sequelize.STRING(25),
+      allowNull: true,
+    },
+    content: {
+      type: Sequelize.JSONB,
       allowNull: true,
     },
     identity: {
       type: Sequelize.STRING(30),
       allowNull: false,
     },
-    type: {
-      type: Sequelize.ENUM(
-        RoomTypeEnum.couple,
-        RoomTypeEnum.group,
-        RoomTypeEnum.channels
-      ),
-      allowNull: false,
-    },
-    isPublic: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: true,
-    },
     workspaceId: {
       type: Sequelize.INTEGER,
-      allowNull: true,
+      allowNull: false,
       field: "workspace_id",
       references: {
         model: "workspaces",
@@ -67,13 +58,13 @@ const Room = sequelize.define(
     timestamps: true,
     paranoid: true,
     underscored: true,
-    tableName: "chat_rooms",
+    tableName: "wikis",
     freezeTableName: true,
     indexes: [
       {
         unique: false,
         concurrently: true,
-        name: "chat_rooms_identity",
+        name: "wikis_identity",
         fields: ["identity"],
         where: {
           deleted_at: null,
@@ -83,14 +74,14 @@ const Room = sequelize.define(
   }
 );
 
-Room.hasMany(RoomUserWorkspaces, {
-  foreignKey: "roomId",
-  as: "roomUserWorkspaces",
+Wiki.hasMany(WikiUserWorkspace, {
+  foreignKey: "wikiId",
+  as: "wikiUserWorkspaces",
 });
 
-RoomUserWorkspaces.belongsTo(Room, {
-  foreignKey: "roomId",
-  as: "room",
+WikiUserWorkspace.belongsTo(Wiki, {
+  foreignKey: "wikiId",
+  as: "wiki",
 });
 
-export default Room;
+export default Wiki;

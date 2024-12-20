@@ -59,8 +59,6 @@ class Server {
         "x-workspace-secret-id"
       ] as string;
 
-      console.log(token, workspaceSecretId)
-
       const user = (await Authenticate.verifyAccessToken(token))
         .data as UserInterface;
       const userWorkspace = await Authenticate.verifyWorkspace(

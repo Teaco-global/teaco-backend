@@ -5,14 +5,14 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('chat_rooms', {
+    await queryInterface.createTable('wikis', {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      label: {
+      title: {
         type: DataTypes.STRING(25),
         allowNull: true
       },
@@ -20,14 +20,9 @@ module.exports = {
         type: DataTypes.STRING(30),
         allowNull: false,
       },
-      type: {
-        type: DataTypes.ENUM('couple', 'group', 'channels'),
-        allowNull: false,
-      },
-      is_public: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
+      content: {
+        type: DataTypes.JSONB,
+        allowNull: true,
       },
       workspace_id: {
         type: DataTypes.INTEGER,
@@ -65,11 +60,11 @@ module.exports = {
         type: DataTypes.DATE,
       },
     });
-    await queryInterface.addIndex('chat_rooms', ['identity'], {
+    await queryInterface.addIndex('wikis', ['identity'], {
       concurrently: true,
       unique: true,
       type: 'UNIQUE',
-      name: 'chat_rooms_identity',
+      name: 'wikis_identity',
       where: {
         deleted_at: null,
       },
@@ -77,7 +72,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeIndex('chat_rooms', 'chat_rooms_identity');
-    await queryInterface.dropTable('chat_rooms');
-  },
+    await queryInterface.dropTable('wikis');
+  }
 };

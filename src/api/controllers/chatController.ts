@@ -27,13 +27,16 @@ export class ChatController {
         });
       }
 
-      const results = await new RoomService().checkCoupleRoomExists({
+      const results = await new RoomService().query({
         workspaceId: userWorkspace.workspace.id,
         userWorkspaceId: userWorkspace.id,
         receiverId: receiverId,
+        type: RoomTypeEnum.couple
       });
 
-      if (results.length === 2) {
+      console.log(results.length)
+
+      if (results.length > 2) {
         const roomIds = results.map((item: any) => {
           return item.room_id;
         });
@@ -48,6 +51,7 @@ export class ChatController {
           identity: `RM-${Ksuid.generate()}`,
           type: RoomTypeEnum.couple,
           isPublic: false,
+          workspaceId: userWorkspace.workspaceId,
           createdById: userWorkspace.id,
           updatedById: userWorkspace.id,
         });
@@ -104,25 +108,11 @@ export class ChatController {
         new Set([userWorkspace.id, ...members])
       );
   
-      const results = await new RoomService().checkGroupRoomExists({
-        workspaceId: userWorkspace.workspace.id,
-        userWorkspaceId: userWorkspace.id,
-        receiverIds: uniquemembers,
-      });
-  
-      if (results.length >= uniquemembers.length) {
-        const roomIds = results.map((item: any) => item.room_id);
-        const roomDetails = await new RoomService().findByPk(roomIds[0]);
-        return res.status(200).json({
-          message: "A channel with these participants already exists.",
-          data: roomDetails,
-        });
-      }
-  
       const data = await new RoomService().create({
         identity: `CH-${Ksuid.generate()}`,
         type: RoomTypeEnum.group,
         isPublic: isPublic,
+        workspaceId: userWorkspace.workspaceId,
         updatedById: userWorkspace.id,
         createdById: userWorkspace.id,
         label: label,
@@ -161,7 +151,6 @@ export class ChatController {
       );
 
       const { roomId, senderId, body } = req.body
-      const room = await new RoomService().findByPk(roomId);
       const message = await new MessageService().create({
         roomId,
         workspaceId: userWorkspace.workspace.id,

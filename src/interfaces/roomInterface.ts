@@ -11,7 +11,7 @@ export interface InputRoomInterface extends ModelCreatorIdExtend {
   identity: string;
   type: RoomTypeEnum;
   isPublic: boolean;
-  // receiverId: number;
+  workspaceId: number;
 }
 
 export interface RoomInterface
@@ -22,6 +22,7 @@ export interface RoomInterface
   identity: string;
   type: RoomTypeEnum;
   isPublic: boolean;
+  workspaceId: number;
 }
 
 export interface RoomModelInterface

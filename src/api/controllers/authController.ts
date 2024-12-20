@@ -136,6 +136,7 @@ export class AuthController {
     );
     return res.status(200).json({
       data: {
+        userWorkspace,
         user,
         workspace,
       },
