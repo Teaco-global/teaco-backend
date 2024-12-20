@@ -175,6 +175,7 @@ export class SprintController {
       status: SprintStatusEnum.STARTED,
       projectId: +projectId,
     });
+    
     return res.status(200).send({
       message: "Active sprint fetched successfully.",
       data: sprint,

@@ -54,6 +54,5 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     await queryInterface.removeIndex('workspaces', 'secret');
     await queryInterface.dropTable('workspaces');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_workspaces_status";');
   }
 };

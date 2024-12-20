@@ -51,6 +51,19 @@ module.exports = {
         type: DataTypes.ENUM('IN_BACKLOG', 'PENDING', 'COMPLETED'),
         defaultValue: 'IN_BACKLOG'
       },
+      priority: {
+        type: DataTypes.ENUM('HIGH', 'LOW', 'MEDIUM'),
+        allowNull: false,
+        defaultValue: 'LOW'
+      },
+      estimated_points: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          min: 1,
+          max: 13,
+        },
+      },
       sprint_id: {
         type: DataTypes.INTEGER,
         references: {
@@ -125,5 +138,8 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('issues');
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "public"."enum_issues_priority";`);
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "public"."enum_issues_status";`);
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "public"."enum_issues_type";`);
   }
 };

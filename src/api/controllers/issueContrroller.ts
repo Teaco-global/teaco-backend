@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { InputIssueInterface, UserInterface } from "../../interfaces";
 import { Authenticate } from "../../middlewares";
 import { IssueService } from "../../services";
-
 export class IssueController {
   public constructor() {}
 
@@ -16,7 +15,7 @@ export class IssueController {
     );
 
     const { issueId } = req.params;
-    const issue = await new IssueService().findByPk(+issueId)
+    const issue = await new IssueService().findByPk(+issueId);
     return res.status(200).json({
       message: "Issue type created successfully.",
       data: issue,
@@ -33,26 +32,36 @@ export class IssueController {
     );
 
     const { projectId } = req.params;
-    const { type, title, parentId, description, sprintId } = req.body;
+    const {
+      type,
+      title,
+      parentId,
+      description,
+      sprintId,
+      estimatedPoints,
+      priority,
+    } = req.body;
     let { columnId } = req.body;
     if (!columnId) {
-      columnId = 1 //TODO: replace this hardcode value
+      columnId = 1; //TODO: replace this hardcode value
     }
-    let issue 
-    try{
+    let issue;
+    try {
       issue = await new IssueService().create({
         type: type,
         workspaceId: userWorkspace.workspace.id,
         projectId: +projectId,
         title: title,
+        estimatedPoints: estimatedPoints,
+        priority: priority,
         parentId: parentId,
         createdById: userWorkspace.id,
         columnId: columnId,
         description: description,
-        sprintId: sprintId
+        sprintId: sprintId,
       });
-    } catch(err) {
-      console.error(err)
+    } catch (err) {
+      console.error(err);
     }
 
     return res.status(200).json({
@@ -71,7 +80,7 @@ export class IssueController {
     );
 
     const { issueId } = req.params;
-    const { type, title, description, status, columnId, sprintId } = req.body;
+    const { type, title, description, status, columnId, sprintId, priority, estimatedPoints } = req.body;
 
     const updateFields: Partial<InputIssueInterface> = {
       type,
@@ -80,6 +89,8 @@ export class IssueController {
       status,
       columnId,
       sprintId,
+      priority,
+      estimatedPoints
     };
 
     const updatedIssue = await new IssueService().updateOne({

@@ -1,6 +1,6 @@
 import * as Sequelize from "sequelize"; // Assuming direct Sequelize import
 import { Database } from "../config"; // Assuming Database holds connection details
-import { IssueStatusEnum, IssueTypeEnum } from "../enums";
+import { IssuePriorityEnum, IssueStatusEnum, IssueTypeEnum } from "../enums";
 import Sprint from "./sprint";
 
 const sequelize = Database.sequelize;
@@ -35,11 +35,28 @@ const Issue = sequelize.define(
     issueCount: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      field: "issue_count"
+      field: "issue_count",
     },
     title: {
       type: Sequelize.STRING(255),
       allowNull: false,
+    },
+    priority: {
+      type: Sequelize.ENUM(
+        IssuePriorityEnum.HIGH,
+        IssuePriorityEnum.LOW,
+        IssuePriorityEnum.MEDIUM
+      ),
+      allowNull: false,
+      defaultValue: IssuePriorityEnum.LOW,
+    },
+    estimatedPoints: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1,
+        max: 13,
+      },
     },
     description: {
       type: Sequelize.STRING(1000),

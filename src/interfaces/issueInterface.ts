@@ -1,6 +1,6 @@
 import * as Sequelize from "sequelize";
 import { ModelTimestampExtend } from ".";
-import { IssueStatusEnum, IssueTypeEnum } from "../enums";
+import { IssuePriorityEnum, IssueStatusEnum, IssueTypeEnum } from "../enums";
 
 export interface InputIssueInterface {
   workspaceId: number;
@@ -11,15 +11,19 @@ export interface InputIssueInterface {
   description?: string;
   parentId?: number;
   status?: IssueStatusEnum;
+  priority: IssuePriorityEnum;
+  estimatedPoints: number;
   sprintId?: number;
   columnId?: number;
   createdById: number;
   assignedToId?: number;
-  assignedById?: number; 
+  assignedById?: number;
 }
 
-export interface IssueInterface extends InputIssueInterface, ModelTimestampExtend {
-    id: number;
+export interface IssueInterface
+  extends InputIssueInterface,
+    ModelTimestampExtend {
+  id: number;
 }
 
 export interface IssueModelInterface
