@@ -40,6 +40,7 @@ export class IssueController {
       sprintId,
       estimatedPoints,
       priority,
+      assignedToId
     } = req.body;
     let { columnId } = req.body;
     if (!columnId) {
@@ -59,6 +60,7 @@ export class IssueController {
         columnId: columnId,
         description: description,
         sprintId: sprintId,
+        assignedToId: assignedToId
       });
     } catch (err) {
       console.error(err);
@@ -80,7 +82,7 @@ export class IssueController {
     );
 
     const { issueId } = req.params;
-    const { type, title, description, status, columnId, sprintId, priority, estimatedPoints } = req.body;
+    const { type, title, description, status, columnId, sprintId, priority, estimatedPoints, assignedToId } = req.body;
 
     const updateFields: Partial<InputIssueInterface> = {
       type,
@@ -90,7 +92,8 @@ export class IssueController {
       columnId,
       sprintId,
       priority,
-      estimatedPoints
+      estimatedPoints,
+      assignedToId
     };
 
     const updatedIssue = await new IssueService().updateOne({

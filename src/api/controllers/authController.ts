@@ -19,33 +19,42 @@ export class AuthController {
   public constructor() {}
 
   static async signUp(req: Request, res: Response): Promise<Response> {
-    const { name, email, password, workspaceName } =
-      req.body as InputUserInterface;
-    Validator.check(signUp, { name, email, password });
+    try {
+      const { name, email, password, workspaceName } =
+        req.body as InputUserInterface;
+      Validator.check(signUp, { name, email, password });
 
-    const userExists = await new UsersService().findOne({ email: email });
-    if (userExists) {
-      return res.status(409).json({
-        error: {
-          message: "User already exists.",
-          code: "CONFLICT",
-        },
+      const userExists = await new UsersService().findOne({ email: email });
+      if (userExists) {
+        return res.status(409).json({
+          error: {
+            message: "User already exists.",
+            code: "CONFLICT",
+          },
+        });
+      }
+      await new UsersService().createUserAndWorkspace({
+        name,
+        email,
+        password,
+        workspaceName,
+      });
+
+      return res.status(200).json({
+        message: "User and workspace created successfully.",
+      });
+    } catch (error) {
+      console.error("Error signing up.");
+      return res.status(500).json({
+        message: "An error occurred while trying to sign up.",
+        error: error.message || "Unexpected error.",
       });
     }
-    await new UsersService().createUserAndWorkspace({
-      name,
-      email,
-      password,
-      workspaceName,
-    });
-
-    return res.status(200).json({
-      message: "User and workspace created successfully.",
-    });
   }
 
   static async verifyAccount(req: Request, res: Response): Promise<Response> {
-    const { email, verificationCode } = req.body;
+    try {
+      const { email, verificationCode } = req.body;
     Validator.check(verifyAccount, { email, verificationCode });
     const emailExists = await new UsersService().findOne({ email: email });
 
@@ -65,6 +74,13 @@ export class AuthController {
     return res.status(200).json({
       message: "Account verified successfully.",
     });
+    } catch(error) { 
+      console.error("Error verifying.");
+      return res.status(500).json({
+        message: "An error occurred while verfying email.",
+        error: error.message || "Unexpected error.",
+      });
+    }
   }
 
   static async resendVerificationCode(
@@ -103,26 +119,34 @@ export class AuthController {
   }
 
   static async login(req: Request, res: Response): Promise<Response> {
-    const { email, password } = req.body;
-    Validator.check(login, { email, password });
-    const userExists = await new UsersService().findOne({ email: email });
+    try {
+      const { email, password } = req.body;
+      Validator.check(login, { email, password });
+      const userExists = await new UsersService().findOne({ email: email });
 
-    if (!userExists) throw new Error(`User does not exists`);
-    if (userExists.status != UsersStatusEnum.VERFIED)
-      throw new Error(
-        "You are not verified, please verify your account and log in."
-      );
+      if (!userExists) throw new Error(`User with email ${email} not exists`);
+      if (userExists.status != UsersStatusEnum.VERFIED)
+        throw new Error(
+          "You are not verified, please verify your account and log in."
+        );
 
-    const matchPassword = await bcrypt.compare(password, userExists.password);
-    if (!matchPassword) throw new Error("Invalid password.");
+      const matchPassword = await bcrypt.compare(password, userExists.password);
+      if (!matchPassword) throw new Error("Invalid password.");
 
-    const accessToken = await Authenticate.generateAcessToken(userExists);
-    return res.status(200).json({
-      message: "Login successfull.",
-      token: {
-        access: accessToken,
-      },
-    });
+      const accessToken = await Authenticate.generateAcessToken(userExists);
+      return res.status(200).json({
+        message: "Login successfull.",
+        token: {
+          access: accessToken,
+        },
+      });
+    } catch (error) {
+      console.error("Error logging in.");
+      return res.status(500).json({
+        message: "An error occurred while trying to log in.",
+        error: error.message || "Unexpected error.",
+      });
+    }
   }
   static async authMe(req: Request, res: Response): Promise<Response> {
     const user = (

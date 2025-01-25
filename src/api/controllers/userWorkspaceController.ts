@@ -280,6 +280,26 @@ export class UserWorkspaceController {
     });
   }
 
+  static async workspaceMember(req: Request, res: Response): Promise<Response> {
+    const { userWorkspaceId } = req.query;
+    const user = (
+      await Authenticate.verifyAccessToken(req.headers.authorization)
+    ).data as UserInterface;
+    const userWorkspace = await Authenticate.verifyWorkspace(
+      req.headers?.["x-workspace-secret-id"] as string,
+      user.id
+    );
+
+    const workspaceMember = await new UserWorkspaceService().findById({
+      id: +userWorkspaceId,
+    });
+
+    return res.status(200).json({
+      message: "Workspace member fetched successfully",
+      data: workspaceMember,
+    });
+  }
+
   static async activeWorkspaceMembers(
     req: Request,
     res: Response
@@ -306,7 +326,7 @@ export class UserWorkspaceController {
       order,
       sort,
       workspaceId: userWorkspace.workspace.id,
-      status: UserWorkspaceStatusEnum.ACCEPTED
+      status: UserWorkspaceStatusEnum.ACCEPTED,
     });
 
     return res.status(200).json({

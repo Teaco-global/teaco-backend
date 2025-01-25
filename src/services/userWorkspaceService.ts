@@ -1,7 +1,10 @@
 import { WhereOptions } from "sequelize";
 import * as Sequelize from "sequelize";
 
-import { InputUserWorkspaceInterface, UserWorkspaceInterface } from "../interfaces";
+import {
+  InputUserWorkspaceInterface,
+  UserWorkspaceInterface,
+} from "../interfaces";
 import {
   RoleRepository,
   UserWorkspaceRepository,
@@ -30,7 +33,11 @@ export class UserWorkspaceService {
     workspaceId: number;
     role: RoleEnum;
   }): Promise<UserWorkspaceInterface> {
-    const userWorkspace = await this.repository.create({ userId, workspaceId, identity: Ksuid.generate() });
+    const userWorkspace = await this.repository.create({
+      userId,
+      workspaceId,
+      identity: Ksuid.generate(),
+    });
     const rolesExists = await this.roleRepository.findOne({
       where: {
         slug: role.toLocaleLowerCase(),
@@ -43,10 +50,39 @@ export class UserWorkspaceService {
     return userWorkspace;
   }
 
+  public async findById({
+    id,
+  }: {
+    id: number;
+  }): Promise<UserWorkspaceInterface> {
+    return this.repository.findByPk(id, {
+      include: [
+        {
+          model: Model.User,
+          as: "user",
+        },
+        {
+          model: Model.Workspace,
+          as: "workspace",
+        },
+        {
+          model: Model.UserWorkspaceRole,
+          as: "userWorkspaceRoles",
+          include: [
+            {
+              model: Model.Role,
+              as: "role",
+            },
+          ],
+        },
+      ],
+    });
+  }
+
   public async findOne({
     userId,
     workspaceId,
-    identity
+    identity,
   }: {
     userId?: number;
     workspaceId?: number;
@@ -125,7 +161,7 @@ export class UserWorkspaceService {
     order,
     userId,
     workspaceId,
-    status
+    status,
   }: {
     offset: number;
     limit: number;
@@ -133,7 +169,7 @@ export class UserWorkspaceService {
     order: string;
     userId?: number;
     workspaceId?: number;
-    status?: UserWorkspaceStatusEnum
+    status?: UserWorkspaceStatusEnum;
   }): Promise<{
     count: number;
     rows: UserWorkspaceInterface[];
@@ -179,12 +215,11 @@ export class UserWorkspaceService {
 
   async updateOne(
     id: Sequelize.CreationOptional<number>,
-    input: Partial<InputUserWorkspaceInterface>,
+    input: Partial<InputUserWorkspaceInterface>
   ): Promise<number[]> {
     if (id) {
       const userExists = await this.repository.findByPk(id);
-      if (!userExists)
-        throw new Error('User does not exists.')
+      if (!userExists) throw new Error("User does not exists.");
     }
     return this.repository.updateOne({
       id: id,
@@ -192,12 +227,8 @@ export class UserWorkspaceService {
     });
   }
 
-  async deleteOne({
-    id,
-  }:{
-    id: number
-  }): Promise<boolean> {
-    await this.repository.deleteOne(id)
-    return true
+  async deleteOne({ id }: { id: number }): Promise<boolean> {
+    await this.repository.deleteOne(id);
+    return true;
   }
 }
