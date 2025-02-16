@@ -52,6 +52,11 @@ export class SprintController {
         user.id
       );
 
+      if (new Date(dueDate) < new Date()) {
+        return res.status(400).json({
+          message: 'Sprint due date must be in the future.' 
+        });
+      }
       const startedSprintExists = await new SprintService().findOne({
         status: SprintStatusEnum.STARTED,
         projectId: +projectId,
