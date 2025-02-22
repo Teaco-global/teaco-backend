@@ -22,14 +22,12 @@ export class WikiUserWorkspaceService {
     limit,
     sort,
     order,
-    userWorkspaceId,
     workspaceId,
   }: {
     offset: number;
     limit: number;
     sort: SortEnum;
     order: string;
-    userWorkspaceId: number;
     workspaceId: number;
   }): Promise<{
     count: number;
@@ -41,7 +39,6 @@ export class WikiUserWorkspaceService {
     if (order && sort) {
       orderItem = [...orderItem, [order, sort]];
     }
-    if (userWorkspaceId) where = { ...where, userWorkspaceId: userWorkspaceId };
     if (workspaceId) where = { ...where, workspaceId: workspaceId };
 
     const {rows, count} = await this.repository.findAndCountAll({

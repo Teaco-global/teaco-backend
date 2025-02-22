@@ -20,7 +20,6 @@ const resendVerificationCode = Joi.object({
 
 const login = Joi.object({
   email: joiSchema.emailSchema.required().label("E-mail"),
-  password: joiSchema.stringSchame.required().min(8).label("Password"),
 });
 
 export { signUp, verifyAccount, resendVerificationCode, login };

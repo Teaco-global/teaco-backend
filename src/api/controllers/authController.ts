@@ -121,10 +121,11 @@ export class AuthController {
   static async login(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
-      Validator.check(login, { email, password });
+      Validator.check(login, { email });
       const userExists = await new UsersService().findOne({ email: email });
 
-      if (!userExists) throw new Error(`User with email ${email} not exists`);
+      if (!userExists) throw new Error(`User with email ${email} does not exists`);
+      console.log({userExists})
       if (userExists.status != UsersStatusEnum.VERFIED)
         throw new Error(
           "You are not verified, please verify your account and log in."
@@ -142,6 +143,7 @@ export class AuthController {
       });
     } catch (error) {
       console.error("Error logging in.");
+      console.log(error)
       return res.status(500).json({
         message: "An error occurred while trying to log in.",
         error: error.message || "Unexpected error.",

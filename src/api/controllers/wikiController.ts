@@ -152,7 +152,6 @@ export class WikiController {
           limit,
           order,
           sort,
-          userWorkspaceId: userWorkspace.id,
           workspaceId: userWorkspace.workspaceId,
         });
       
